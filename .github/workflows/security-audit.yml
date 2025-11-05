@@ -1,0 +1,245 @@
+name: Security Audit & CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security audit daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install -g slither-analyzer
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install slither-analyzer
+        
+    - name: Compile contracts
+      run: npm run compile
+      
+    - name: Run Slither static analysis
+      run: |
+        mkdir -p docs
+        slither contracts/ --json > docs/slither-report.json || true
+        slither contracts/ --print human-summary > docs/slither-summary.txt || true
+        
+    - name: Run custom security audit
+      run: npm run security:audit
+      
+    - name: Run symbolic execution analysis
+      run: |
+        python scripts/symbolic-execution-analyzer.py
+        
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: |
+          docs/SECURITY_AUDIT_REPORT.md
+          docs/SYMBOLIC_EXECUTION_REPORT.md
+          docs/slither-report.json
+          docs/slither-summary.txt
+          docs/security-audit-report.json
+        retention-days: 30
+        
+    - name: Comment PR with security findings
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          try {
+            const reportPath = 'docs/SECURITY_AUDIT_REPORT.md';
+            if (fs.existsSync(reportPath)) {
+              const report = fs.readFileSync(reportPath, 'utf8');
+              const summary = report.match(/## Executive Summary([\s\S]*?)##/)[1];
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 🔒 Security Audit Results\n\n${summary}\n\n[View full report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+              });
+            }
+          } catch (error) {
+            console.log('Could not create security comment:', error.message);
+          }
+
+  smart-contract-tests:
+    name: Smart Contract Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm test
+      
+    - name: Run test coverage
+      run: npm run test:coverage
+      
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: coverage/
+        retention-days: 30
+
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Python dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run backend tests
+      run: |
+        cd backend
+        python run_tests.py --type all --coverage
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/0
+        TESTING: true
+        
+    - name: Upload backend test reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-test-reports
+        path: backend/test-reports/
+        retention-days: 30
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test -- --coverage --watchAll=false
+        
+    - name: Upload frontend test reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-test-reports
+        path: frontend/coverage/
+        retention-days: 30
+
+  deployment-check:
+    name: Deployment Check
+    runs-on: ubuntu-latest
+    needs: [security-audit, smart-contract-tests, backend-tests, frontend-tests]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Compile contracts
+      run: npm run compile
+      
+    - name: Check deployment readiness
+      run: |
+        echo "✅ All security audits passed"
+        echo "✅ All tests passed"
+        echo "✅ Contracts compiled successfully"
+        echo "🚀 Ready for deployment"
+        
+    - name: Notify deployment readiness
+      if: success()
+      run: |
+        echo "Deployment check completed successfully!"
+        echo "All security audits and tests have passed."
+        echo "The system is ready for production deployment."

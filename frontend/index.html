@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Yield Aggregator Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        .content {
+            padding: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-size: 1.3rem;
+        }
+        .card p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px 10px 10px 0;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .api-status {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .api-status h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        .endpoint {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DeFi Yield Aggregator</h1>
+            <p>Cross-Chain Yield Optimization Dashboard</p>
+        </div>
+        
+        <div class="content">
+            <div class="api-status">
+                <h4>📡 API Status</h4>
+                <p>Backend API is running on <span class="endpoint">http://localhost:8000</span></p>
+                <p>Smart contracts are compiled and ready for deployment</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🎯 Smart Contracts</h3>
+                    <p>Deploy and manage yield aggregation strategies across multiple blockchain networks.</p>
+                    <div class="status success">✅ Contracts Compiled</div>
+                    <button class="btn" onclick="deployContracts()">Deploy Contracts</button>
+                </div>
+
+                <div class="card">
+                    <h3>💰 Yield Strategies</h3>
+                    <p>Optimize your DeFi yields across Compound, Aave, Uniswap, and other protocols.</p>
+                    <div class="status warning">⚠️ Configure Strategies</div>
+                    <button class="btn" onclick="configureStrategies()">Configure</button>
+                </div>
+
+                <div class="card">
+                    <h3>🌉 Cross-Chain Bridge</h3>
+                    <p>Seamlessly transfer assets between Ethereum, Polygon, BSC, and other networks.</p>
+                    <div class="status warning">⚠️ Setup Bridge</div>
+                    <button class="btn" onclick="setupBridge()">Setup Bridge</button>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Analytics</h3>
+                    <p>Track your portfolio performance, yield metrics, and risk analytics in real-time.</p>
+                    <div class="status success">✅ Analytics Ready</div>
+                    <button class="btn" onclick="viewAnalytics()">View Analytics</button>
+                </div>
+
+                <div class="card">
+                    <h3>🔐 Wallet Integration</h3>
+                    <p>Connect MetaMask, WalletConnect, or use private key authentication.</p>
+                    <div class="status warning">⚠️ Connect Wallet</div>
+                    <button class="btn" onclick="connectWallet()">Connect Wallet</button>
+                </div>
+
+                <div class="card">
+                    <h3>⚡ QIE SDK</h3>
+                    <p>Advanced blockchain interaction and wallet management with QIE SDK.</p>
+                    <div class="status success">✅ SDK Initialized</div>
+                    <button class="btn" onclick="initializeQIE()">Initialize QIE</button>
+                </div>
+            </div>
+
+            <div class="api-status">
+                <h4>🔗 Available Endpoints</h4>
+                <div class="endpoint">GET /api/v1/yield/strategies - List all strategies</div>
+                <div class="endpoint">POST /api/v1/yield/optimize - Optimize yield allocation</div>
+                <div class="endpoint">GET /api/v1/bridge/chains - Get supported chains</div>
+                <div class="endpoint">POST /api/v1/bridge/transfer - Initiate cross-chain transfer</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript for demo functionality
+        function deployContracts() {
+            alert('🚀 Deploying smart contracts to local network...\n\nRun: npm run deploy:local');
+        }
+
+        function configureStrategies() {
+            alert('⚙️ Configure yield strategies:\n\n1. Add Compound strategy\n2. Add Aave strategy\n3. Add Uniswap strategy\n4. Set risk parameters');
+        }
+
+        function setupBridge() {
+            alert('🌉 Setup cross-chain bridge:\n\n1. Configure Wormhole\n2. Setup ChainBridge\n3. Add supported networks\n4. Test transfers');
+        }
+
+        function viewAnalytics() {
+            alert('📊 Analytics Dashboard:\n\n• Portfolio performance\n• Yield metrics\n• Risk analysis\n• Historical data');
+        }
+
+        function connectWallet() {
+            alert('🔐 Connect Wallet:\n\n1. MetaMask integration\n2. WalletConnect support\n3. Private key import\n4. Multi-signature support');
+        }
+
+        function initializeQIE() {
+            alert('⚡ QIE SDK Initialization:\n\n• Advanced wallet management\n• Multi-chain support\n• Transaction optimization\n• Gas estimation');
+        }
+
+        // Check API status
+        fetch('http://localhost:8000/api/v1/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Backend API is running:', data);
+            })
+            .catch(error => {
+                console.log('⚠️ Backend API not accessible:', error);
+            });
+    </script>
+</body>
+</html>

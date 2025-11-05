@@ -1,0 +1,234 @@
+{
+  "timestamp": "2025-10-23T18:26:56.771Z",
+  "contracts": [
+    {
+      "name": "BridgeAdapter",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\BridgeAdapter.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        }
+      ]
+    },
+    {
+      "name": "MockERC20",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\MockERC20.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "event-logging",
+          "severity": "low",
+          "description": "Important functions without event logging",
+          "recommendation": "Add events for important state changes"
+        }
+      ]
+    },
+    {
+      "name": "QIESettlement",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\QIESettlement.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        },
+        {
+          "type": "gas-optimization",
+          "severity": "info",
+          "description": "Gas optimization opportunities",
+          "recommendation": "Consider caching storage variables in loops; Use memory instead of storage when possible"
+        }
+      ]
+    },
+    {
+      "name": "CompoundStrategy",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\strategies\\CompoundStrategy.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        }
+      ]
+    },
+    {
+      "name": "StakingStrategy",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\strategies\\StakingStrategy.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        }
+      ]
+    },
+    {
+      "name": "UniswapV3Strategy",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\strategies\\UniswapV3Strategy.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        }
+      ]
+    },
+    {
+      "name": "WrappedToken",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\WrappedToken.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "event-logging",
+          "severity": "low",
+          "description": "Important functions without event logging",
+          "recommendation": "Add events for important state changes"
+        }
+      ]
+    },
+    {
+      "name": "YieldAggregator",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\YieldAggregator.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        },
+        {
+          "type": "gas-optimization",
+          "severity": "info",
+          "description": "Gas optimization opportunities",
+          "recommendation": "Consider caching storage variables in loops; Use memory instead of storage when possible"
+        }
+      ]
+    },
+    {
+      "name": "YieldCalculator",
+      "path": "C:\\Users\\AADHITHAN\\Downloads\\Project 1\\contracts\\YieldCalculator.sol",
+      "vulnerabilities": [
+        {
+          "type": "integer-overflow",
+          "severity": "medium",
+          "description": "Potential integer overflow/underflow",
+          "recommendation": "Use SafeMath or Solidity 0.8+ built-in overflow protection"
+        },
+        {
+          "type": "timestamp-dependency",
+          "severity": "low",
+          "description": "Timestamp dependency detected",
+          "recommendation": "Be aware of miner manipulation of block.timestamp"
+        }
+      ]
+    }
+  ],
+  "vulnerabilities": [],
+  "recommendations": [
+    {
+      "category": "Access Control",
+      "priority": "High",
+      "items": [
+        "Implement comprehensive access control using OpenZeppelin AccessControl",
+        "Use role-based permissions for different functions",
+        "Implement multi-signature requirements for critical operations"
+      ]
+    },
+    {
+      "category": "Reentrancy Protection",
+      "priority": "High",
+      "items": [
+        "Use OpenZeppelin ReentrancyGuard for all external calls",
+        "Follow checks-effects-interactions pattern",
+        "Implement proper state management before external calls"
+      ]
+    },
+    {
+      "category": "Input Validation",
+      "priority": "Medium",
+      "items": [
+        "Validate all input parameters",
+        "Implement proper bounds checking",
+        "Use require statements with descriptive error messages"
+      ]
+    },
+    {
+      "category": "Gas Optimization",
+      "priority": "Medium",
+      "items": [
+        "Use packed structs for storage efficiency",
+        "Implement batch operations where possible",
+        "Cache frequently accessed storage variables"
+      ]
+    },
+    {
+      "category": "Monitoring & Events",
+      "priority": "Low",
+      "items": [
+        "Implement comprehensive event logging",
+        "Add monitoring for critical functions",
+        "Implement circuit breakers for emergency situations"
+      ]
+    }
+  ],
+  "summary": {
+    "totalContracts": 9,
+    "highRisk": 0,
+    "mediumRisk": 0,
+    "lowRisk": 0,
+    "info": 0
+  }
+}

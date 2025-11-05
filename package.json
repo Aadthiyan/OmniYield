@@ -1,0 +1,59 @@
+{
+  "name": "defi-cross-chain-yield-aggregator",
+  "version": "1.0.0",
+  "description": "Cross-Chain Yield Aggregator Backend using QIE SDK",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network testnet",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "deploy:ethereum": "hardhat run scripts/deploy.js --network ethereum",
+    "node": "hardhat node",
+    "clean": "hardhat clean",
+    "verify": "hardhat verify",
+    "security:audit": "node scripts/security-audit.js",
+    "security:slither": "slither contracts/ --json > docs/slither-report.json",
+    "security:symbolic": "python scripts/symbolic-execution-analyzer.py",
+    "security:all": "npm run security:audit && npm run security:slither && npm run security:symbolic",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "eslint . --ext .js,.ts --fix"
+  },
+  "keywords": [
+    "defi",
+    "yield-aggregator",
+    "cross-chain",
+    "qie-sdk",
+    "blockchain"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0",
+    "express": "^4.18.2",
+    "joi": "^17.11.0",
+    "web3": "^4.2.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@types/node": "^20.8.0",
+    "hardhat": "^2.19.0",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.2.2",
+    "eslint": "^8.52.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.0",
+    "solidity-coverage": "^0.8.5"
+  }
+}
