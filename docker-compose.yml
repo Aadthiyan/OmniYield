@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Neon in production, local for testing)
+  postgres:
+    image: postgres:15-alpine
+    container_name: omniyield_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: YieldX
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: omniyield_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: omniyield_backend
+    environment:
+      # For local development, use local database
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/YieldX?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      NODE_ENV: development
+      DEBUG: "true"
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:10000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app  # Hot reload for development
+    command: uvicorn app.main:app --host 0.0.0.0 --port 10000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: omniyield_network
