@@ -22,12 +22,18 @@ async def get_redis():
     """Get Redis client instance"""
     global redis_client
     if redis_client is None:
-        redis_client = redis.from_url(
-            REDIS_CONFIG["url"],
-            password=REDIS_CONFIG["password"],
-            db=REDIS_CONFIG["db"],
-            decode_responses=REDIS_CONFIG["decode_responses"]
-        )
+        try:
+            redis_client = redis.from_url(
+                REDIS_CONFIG["url"],
+                password=REDIS_CONFIG["password"],
+                db=REDIS_CONFIG["db"],
+                decode_responses=REDIS_CONFIG["decode_responses"]
+            )
+            # Test connection
+            await redis_client.ping()
+        except Exception as e:
+            logger.warning(f"Redis connection failed: {e}. Redis features will be disabled.")
+            redis_client = None
     return redis_client
 
 async def close_redis():
@@ -49,11 +55,13 @@ async def init_db():
     try:
         # Import all models here to ensure they are registered
         from . import models
-        Base.metadata.create_all(bind=engine)
+        # Use checkfirst=True to avoid creating tables that already exist
+        Base.metadata.create_all(bind=engine, checkfirst=True)
         logger.info("Database initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
-        raise
+        # Don't raise - let the app continue even if tables already exist
+        logger.warning("Continuing despite database initialization error")
 
 async def check_db_connection():
     """Check database connection health"""

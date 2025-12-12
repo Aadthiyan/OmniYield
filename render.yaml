@@ -13,8 +13,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.7
       - key: DATABASE_URL
-        scope: build
-        value: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
+        value: postgresql://neondb_owner:npg_wX6Yx4uGBJtr@ep-shiny-paper-a41jqa6v-pooler.us-east-1.aws.neon.tech/YieldX?sslmode=require&channel_binding=require
       - key: REDIS_URL
         value: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
       - key: ENVIRONMENT
@@ -38,16 +37,9 @@ services:
       - key: QIE_CHAIN_ID
         value: "1983"
 
-  - type: pserv
-    name: defi-yield-db
-    plan: standard
-    ipAllowList: []
-    postgresMajorVersion: 15
-
-  - type: redis
-    name: defi-yield-cache
-    plan: standard
-    maxmemoryPolicy: allkeys-lru
+  # Database: Using Neon PostgreSQL (https://neon.tech/)
+  # Database URL: postgresql://neondb_owner:npg_wX6Yx4uGBJtr@ep-shiny-paper-a41jqa6v-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+  # No need to configure here - just set DATABASE_URL environment variable above
     
 databases:
   - name: defi_yield_db
