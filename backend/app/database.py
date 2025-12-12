@@ -79,6 +79,8 @@ async def check_redis_connection():
     """Check Redis connection health"""
     try:
         redis_client = await get_redis()
+        if redis_client is None:
+            return False
         await redis_client.ping()
         return True
     except Exception as e:
