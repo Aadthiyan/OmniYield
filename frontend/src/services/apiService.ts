@@ -10,7 +10,12 @@ import {
   RebalanceRequest,
   RebalanceResponse,
   ApiResponse,
-  PaginatedResponse
+  PaginatedResponse,
+  LoginRequest,
+  SignupRequest,
+  ConnectWalletRequest,
+  AuthResponse,
+  AuthToken
 } from '@/types';
 
 class ApiService {
@@ -122,6 +127,57 @@ class ApiService {
   async refreshYieldData(): Promise<{ message: string }> {
     const response = await this.api.post('/api/v1/yield/refresh-data');
     return response.data;
+  }
+
+  // Authentication
+  async login(credentials: LoginRequest): Promise<AuthResponse> {
+    const response = await this.api.post('/api/auth/login', credentials);
+    // Store token in localStorage
+    if (response.data.accessToken) {
+      localStorage.setItem('authToken', response.data.accessToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+
+  async signup(data: SignupRequest): Promise<AuthResponse> {
+    const response = await this.api.post('/api/auth/signup', data);
+    // Store token in localStorage
+    if (response.data.accessToken) {
+      localStorage.setItem('authToken', response.data.accessToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+
+  async connectWallet(walletRequest: ConnectWalletRequest): Promise<AuthToken> {
+    const response = await this.api.post('/api/auth/connect-wallet', walletRequest);
+    // Store token in localStorage
+    if (response.data.accessToken) {
+      localStorage.setItem('authToken', response.data.accessToken);
+      localStorage.setItem('walletAddress', walletRequest.walletAddress);
+    }
+    return response.data;
+  }
+
+  // Logout (clear local storage and token)
+  logout(): void {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('walletAddress');
+    // Reset authorization header
+    delete this.api.defaults.headers.common['Authorization'];
+  }
+
+  // Get current user from localStorage
+  getCurrentUser(): any {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  // Get current wallet address from localStorage
+  getCurrentWallet(): string | null {
+    return localStorage.getItem('walletAddress');
   }
 
   // Bridge operations

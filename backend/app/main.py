@@ -7,6 +7,8 @@ import logging
 from contextlib import asynccontextmanager
 from .routers.yield_routes import router as yield_router
 from .routers.bridge_routes import router as bridge_router
+from .routers.user_routes import router as user_router
+from .routers.auth_routes import router as auth_router
 from .database import init_db, check_db_connection, check_redis_connection
 from .config import settings
 
@@ -104,7 +106,10 @@ async def root():
     }
 
 # Include routers
+app.include_router(auth_router)  # No prefix, auth routes have their own
 app.include_router(yield_router, prefix=settings.API_V1_STR)
 app.include_router(bridge_router, prefix=settings.API_V1_STR)
+app.include_router(user_router, prefix=settings.API_V1_STR)
+
 
 

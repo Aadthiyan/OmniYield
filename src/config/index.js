@@ -38,6 +38,13 @@ const config = {
       name: 'Mumbai Testnet',
       symbol: 'MATIC'
     }
+    ,
+    qie: {
+      rpcUrl: process.env.QIE_RPC_URL,
+      chainId: process.env.QIE_CHAIN_ID ? Number(process.env.QIE_CHAIN_ID) : undefined,
+      name: 'QIE',
+      symbol: 'QIE'
+    }
   },
 
   // QIE SDK Configuration

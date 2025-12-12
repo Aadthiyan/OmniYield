@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { WalletIcon, KeyIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/outline';
 import { useWallet } from '@/hooks/useWallet';
@@ -88,7 +90,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ onClose 
                   }
                 `} />
               </div>
-              
+
               <div className="flex-1">
                 <h3 className={`
                   font-medium
@@ -114,7 +116,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ onClose 
                   </p>
                 )}
               </div>
-              
+
               {selectedType === walletType.type && (
                 <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                   <div className="w-2 h-2 bg-white rounded-full"></div>

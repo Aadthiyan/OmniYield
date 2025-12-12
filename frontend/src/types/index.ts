@@ -2,7 +2,8 @@
 
 export interface User {
   id: string;
-  walletAddress: string;
+  name: string;
+  walletAddress?: string;
   email?: string;
   isActive: boolean;
   preferences: UserPreferences;
@@ -41,7 +42,7 @@ export interface Strategy {
   metadata?: Record<string, any>;
 }
 
-export type StrategyType = 
+export type StrategyType =
   | 'compound'
   | 'uniswap_v3'
   | 'aave'
@@ -50,7 +51,7 @@ export type StrategyType =
   | 'lending'
   | 'farming';
 
-export type Network = 
+export type Network =
   | 'ethereum'
   | 'polygon'
   | 'bsc'
@@ -129,7 +130,7 @@ export interface Transaction {
   metadata: Record<string, any>;
 }
 
-export type TransactionType = 
+export type TransactionType =
   | 'deposit'
   | 'withdraw'
   | 'rebalance'
@@ -137,7 +138,7 @@ export type TransactionType =
   | 'bridge'
   | 'claim';
 
-export type TransactionStatus = 
+export type TransactionStatus =
   | 'pending'
   | 'confirmed'
   | 'failed'
@@ -317,7 +318,7 @@ export interface QIETransactionResult {
 
 // UI State Types
 export interface UIState {
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'system';
   sidebarOpen: boolean;
   loading: boolean;
   error: string | null;
@@ -361,4 +362,32 @@ export interface SettingsFormData {
   riskTolerance: number;
   defaultSlippage: number;
   notifications: NotificationSettings;
+}
+
+// Authentication Types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface ConnectWalletRequest {
+  walletAddress: string;
+  signature?: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  tokenType: string;
+  user: User;
+}
+
+export interface AuthToken {
+  accessToken: string;
+  tokenType: string;
 }

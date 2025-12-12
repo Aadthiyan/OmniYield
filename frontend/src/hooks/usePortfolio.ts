@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStore, useStoreActions } from '@/store';
+import { useStore } from '@/store/useStore';
 import { apiService } from '@/services/apiService';
 import { PortfolioSummary, UserStrategy, OptimizationRequest, OptimizationResponse, RebalanceRequest, RebalanceResponse } from '@/types';
 
 export const usePortfolio = () => {
-  const { userStrategies, portfolioSummary, loading } = useStore();
-  const { setUserStrategies, setPortfolioSummary, setLoading, setError, addNotification } = useStoreActions();
+  const userStrategies = useStore((state) => state.userStrategies);
+  const portfolioSummary = useStore((state) => state.portfolioSummary);
+  const loading = useStore((state) => state.loading);
+  const setUserStrategies = useStore((state) => state.setUserStrategies);
+  const setPortfolioSummary = useStore((state) => state.setPortfolioSummary);
+  const setLoading = useStore((state) => state.setLoading);
+  const setError = useStore((state) => state.setError);
+  const addNotification = useStore((state) => state.addNotification);
   const [optimizing, setOptimizing] = useState(false);
   const [rebalancing, setRebalancing] = useState(false);
 
@@ -47,7 +53,8 @@ export const usePortfolio = () => {
       addNotification({
         type: 'error',
         title: 'Failed to Load Portfolio',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     } finally {
       setLoading('portfolio', false);
@@ -60,8 +67,23 @@ export const usePortfolio = () => {
       setLoading('portfolio', true);
       setError(null);
 
+      // Add defensive check for apiService
+      if (!apiService || typeof apiService.getUserAnalytics !== 'function') {
+        console.warn('API service not properly initialized. Using mock data.');
+        const summary: PortfolioSummary = {
+          totalValue: '0',
+          totalYield: '0',
+          dailyChange: '0',
+          dailyChangePercent: 0,
+          strategies: [],
+          allocation: []
+        };
+        setPortfolioSummary(summary);
+        return;
+      }
+
       const analytics = await apiService.getUserAnalytics(userId);
-      
+
       // Create portfolio summary from analytics
       const summary: PortfolioSummary = {
         totalValue: analytics.currentTvl,
@@ -75,11 +97,25 @@ export const usePortfolio = () => {
       setPortfolioSummary(summary);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch portfolio summary';
+      console.error('Portfolio fetch error:', errorMessage);
       setError(errorMessage);
+
+      // Set a default summary instead of crashing
+      const defaultSummary: PortfolioSummary = {
+        totalValue: '0',
+        totalYield: '0',
+        dailyChange: '0',
+        dailyChangePercent: 0,
+        strategies: [],
+        allocation: []
+      };
+      setPortfolioSummary(defaultSummary);
+
       addNotification({
         type: 'error',
         title: 'Failed to Load Portfolio Summary',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     } finally {
       setLoading('portfolio', false);
@@ -93,11 +129,12 @@ export const usePortfolio = () => {
       setError(null);
 
       const response = await apiService.optimizeYield(request);
-      
+
       addNotification({
         type: 'success',
         title: 'Portfolio Optimized',
-        message: `Expected APY: ${(response.expectedApy * 100).toFixed(2)}%`
+        message: `Expected APY: ${(response.expectedApy * 100).toFixed(2)}%`,
+        read: false
       });
 
       return response;
@@ -107,7 +144,8 @@ export const usePortfolio = () => {
       addNotification({
         type: 'error',
         title: 'Optimization Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       return null;
     } finally {
@@ -122,11 +160,12 @@ export const usePortfolio = () => {
       setError(null);
 
       const response = await apiService.rebalancePortfolio(request);
-      
+
       addNotification({
         type: 'success',
         title: 'Portfolio Rebalanced',
-        message: `Rebalancing completed with ${response.rebalanceActions.length} actions`
+        message: `Rebalancing completed with ${response.rebalanceActions.length} actions`,
+        read: false
       });
 
       return response;
@@ -136,7 +175,8 @@ export const usePortfolio = () => {
       addNotification({
         type: 'error',
         title: 'Rebalancing Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       return null;
     } finally {
@@ -156,9 +196,9 @@ export const usePortfolio = () => {
       };
     }
 
-    const totalValue = userStrategies.reduce((sum, strategy) => sum + BigInt(strategy.amount), 0n);
+    const totalValue = userStrategies.reduce((sum, strategy) => sum + BigInt(strategy.amount), BigInt(0));
     const totalWeight = userStrategies.reduce((sum, strategy) => sum + strategy.weight, 0);
-    
+
     // Mock calculations - in real app, these would come from strategy data
     const averageApy = 0.05; // 5%
     const averageRisk = 0.3; // 30%
@@ -195,11 +235,11 @@ export const usePortfolio = () => {
     // Mock performance data - in real app, this would come from historical data
     const days = 30;
     const data = [];
-    
+
     for (let i = days; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      
+
       data.push({
         date: date.toISOString().split('T')[0],
         value: 1000 + Math.random() * 100 - 50, // Mock value fluctuation
@@ -218,11 +258,12 @@ export const usePortfolio = () => {
         fetchUserStrategies(userId),
         fetchPortfolioSummary(userId)
       ]);
-      
+
       addNotification({
         type: 'success',
         title: 'Portfolio Refreshed',
-        message: 'Portfolio data has been updated'
+        message: 'Portfolio data has been updated',
+        read: false
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to refresh portfolio';
@@ -230,7 +271,8 @@ export const usePortfolio = () => {
       addNotification({
         type: 'error',
         title: 'Refresh Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     }
   }, [fetchUserStrategies, fetchPortfolioSummary, setError, addNotification]);

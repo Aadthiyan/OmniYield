@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { usePortfolio } from '@/hooks/usePortfolio';
@@ -37,16 +39,16 @@ export const PortfolioChart: React.FC = () => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tick={{ fontSize: 12 }}
                 tickFormatter={(value) => new Date(value).toLocaleDateString()}
               />
-              <YAxis 
+              <YAxis
                 tick={{ fontSize: 12 }}
                 tickFormatter={(value) => `$${value.toFixed(0)}`}
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{
                   backgroundColor: 'rgba(0, 0, 0, 0.8)',
                   border: 'none',
@@ -59,10 +61,10 @@ export const PortfolioChart: React.FC = () => {
                 ]}
                 labelFormatter={(value) => new Date(value).toLocaleDateString()}
               />
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                stroke="#3B82F6" 
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#3B82F6"
                 strokeWidth={2}
                 dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
                 activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
@@ -93,7 +95,7 @@ export const PortfolioChart: React.FC = () => {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 formatter={(value: any, name: string) => [
                   `${value.toFixed(1)}%`,
                   'Allocation'
@@ -108,13 +110,13 @@ export const PortfolioChart: React.FC = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        
+
         {/* Legend */}
         <div className="mt-4 space-y-2">
           {allocationData.map((item, index) => (
             <div key={item.name} className="flex items-center justify-between text-sm">
               <div className="flex items-center">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />

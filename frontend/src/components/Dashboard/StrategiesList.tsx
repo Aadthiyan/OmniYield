@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { useStrategies } from '@/hooks/useStrategies';
 import { formatAPY, formatTVL, formatRiskScore, getRiskColor, getRiskBgColor } from '@/utils/formatters';
@@ -7,13 +9,15 @@ export const StrategiesList: React.FC = () => {
   const { strategies, loading, getTopStrategies } = useStrategies();
   const [topStrategies, setTopStrategies] = React.useState<any[]>([]);
 
-  React.useEffect(() => {
-    const fetchTopStrategies = async () => {
-      const top = await getTopStrategies(5);
-      setTopStrategies(top);
-    };
-    fetchTopStrategies();
-  }, [getTopStrategies]);
+  /*
+    React.useEffect(() => {
+      const fetchTopStrategies = async () => {
+        const top = await getTopStrategies(5);
+        setTopStrategies(top);
+      };
+      fetchTopStrategies();
+    }, [getTopStrategies]);
+  */
 
   if (loading) {
     return (
@@ -78,7 +82,7 @@ export const StrategiesList: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <div className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -88,7 +92,7 @@ export const StrategiesList: React.FC = () => {
                       APY
                     </div>
                   </div>
-                  
+
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatTVL(strategy.tvl)}
@@ -97,13 +101,13 @@ export const StrategiesList: React.FC = () => {
                       TVL
                     </div>
                   </div>
-                  
+
                   <div className="text-right">
                     <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRiskBgColor(strategy.riskScore)} ${getRiskColor(strategy.riskScore)}`}>
                       {formatRiskScore(strategy.riskScore)}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center">
                     {index < 3 ? (
                       <ArrowUpIcon className="w-4 h-4 text-green-500" />
@@ -122,7 +126,7 @@ export const StrategiesList: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         <div className="mt-6">
           <button className="w-full btn-secondary">
             View All Strategies

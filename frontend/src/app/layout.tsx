@@ -1,16 +1,21 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'DeFi Yield Aggregator',
+  title: 'YieldX - DeFi Yield Aggregator',
   description: 'Advanced DeFi yield farming dashboard with cross-chain bridge integration',
-  keywords: ['DeFi', 'yield farming', 'cross-chain', 'bridge', 'QIE SDK'],
-  authors: [{ name: 'DeFi Yield Aggregator Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+  keywords: ['DeFi', 'yield farming', 'cross-chain', 'bridge', 'YieldX'],
+  authors: [{ name: 'YieldX Team' }],
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -21,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

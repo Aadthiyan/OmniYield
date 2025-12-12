@@ -1,6 +1,7 @@
+"use client";
+
 import React from 'react';
-import { useStore, useStoreActions } from '@/store';
-import { Sidebar } from './Sidebar';
+import { useStore } from '@/store/useStore';
 import { Header } from './Header';
 import { NotificationCenter } from './NotificationCenter';
 import { Modal } from './Modal';
@@ -10,38 +11,28 @@ interface DashboardLayoutProps {
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const { ui, modal } = useStore();
-  const { setUI } = useStoreActions();
-
-  const toggleSidebar = () => {
-    setUI({ sidebarOpen: !ui.sidebarOpen });
-  };
+  const modal = useStore((state) => state.modal);
+  const setModal = useStore((state) => state.setModal);
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 ${ui.theme}`}>
-      {/* Sidebar */}
-      <Sidebar isOpen={ui.sidebarOpen} onClose={() => setUI({ sidebarOpen: false })} />
-      
-      {/* Main content */}
-      <div className={`transition-all duration-300 ${ui.sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
-        {/* Header */}
-        <Header onToggleSidebar={toggleSidebar} />
-        
-        {/* Page content */}
-        <main className="p-6">
-          {children}
-        </main>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-purple-950">
+      {/* Header with navigation */}
+      <Header />
+
+      {/* Page content */}
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {children}
+      </main>
 
       {/* Notification Center */}
       <NotificationCenter />
 
       {/* Modal */}
-      <Modal 
+      <Modal
         isOpen={modal.isOpen}
         type={modal.type}
         data={modal.data}
-        onClose={() => setUI({ modal: { isOpen: false } })}
+        onClose={() => setModal({ isOpen: false })}
       />
     </div>
   );

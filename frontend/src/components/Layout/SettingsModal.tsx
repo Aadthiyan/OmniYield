@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore, useStoreActions } from '@/store';
+import { useStore } from '@/store/useStore';
 import { SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
 
 interface SettingsModalProps {
@@ -7,8 +7,8 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
-  const { ui } = useStore();
-  const { updateUserPreferences } = useStoreActions();
+  const ui = useStore((state) => state.ui);
+  const updateUserPreferences = useStore((state) => state.updateUserPreferences);
   const [settings, setSettings] = useState({
     theme: ui.theme,
     currency: 'USD' as 'USD' | 'EUR' | 'ETH' | 'BTC',

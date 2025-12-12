@@ -70,7 +70,7 @@ const initialState = {
   portfolioSummary: null,
   ui: {
     theme: 'system' as const,
-    sidebarOpen: false,
+    sidebarOpen: true,
     loading: false,
     error: null,
     notifications: []

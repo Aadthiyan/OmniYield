@@ -1,0 +1,55 @@
+# Render.com deployment configuration for backend
+# Save this as render.yaml in the root directory
+
+services:
+  - type: web
+    name: defi-yield-backend
+    env: python
+    plan: standard
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn backend.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000}
+    
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.7
+      - key: DATABASE_URL
+        scope: build
+        value: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
+      - key: REDIS_URL
+        value: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: API_URL
+        value: https://defi-yield-backend.onrender.com
+      - key: FRONTEND_URL
+        value: https://your-frontend.vercel.app
+      - key: CORS_ORIGINS
+        value: "https://your-frontend.vercel.app,https://www.your-frontend.vercel.app"
+      - key: SECRET_KEY
+        scope: secret
+        value: ${SECRET_KEY}
+      - key: JWT_SECRET_KEY
+        scope: secret
+        value: ${JWT_SECRET_KEY}
+      - key: QIE_RPC_URL
+        value: https://rpc1testnet.qie.digital
+      - key: QIE_CHAIN_ID
+        value: "1983"
+
+  - type: pserv
+    name: defi-yield-db
+    plan: standard
+    ipAllowList: []
+    postgresMajorVersion: 15
+
+  - type: redis
+    name: defi-yield-cache
+    plan: standard
+    maxmemoryPolicy: allkeys-lru
+    
+databases:
+  - name: defi_yield_db
+    user: defi_user
+    plan: standard

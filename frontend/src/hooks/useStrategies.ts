@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStore, useStoreActions } from '@/store';
+import { useStore } from '@/store/useStore';
 import { apiService } from '@/services/apiService';
 import { Strategy, Network } from '@/types';
 
 export const useStrategies = () => {
-  const { strategies, loading } = useStore();
-  const { setStrategies, setLoading, setError, addNotification } = useStoreActions();
+  const strategies = useStore((state) => state.strategies);
+  const loading = useStore((state) => state.loading);
+  const setStrategies = useStore((state) => state.setStrategies);
+  const setLoading = useStore((state) => state.setLoading);
+  const setError = useStore((state) => state.setError);
+  const addNotification = useStore((state) => state.addNotification);
   const [refreshing, setRefreshing] = useState(false);
 
   // Fetch strategies
@@ -22,7 +26,8 @@ export const useStrategies = () => {
       addNotification({
         type: 'error',
         title: 'Failed to Load Strategies',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     } finally {
       setLoading('strategies', false);
@@ -41,7 +46,8 @@ export const useStrategies = () => {
       addNotification({
         type: 'error',
         title: 'Failed to Load Strategy',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       return null;
     }
@@ -55,11 +61,12 @@ export const useStrategies = () => {
 
       await apiService.refreshYieldData();
       await fetchStrategies(network);
-      
+
       addNotification({
         type: 'success',
         title: 'Strategies Refreshed',
-        message: 'Yield data has been updated successfully'
+        message: 'Yield data has been updated successfully',
+        read: false
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to refresh strategies';
@@ -67,7 +74,8 @@ export const useStrategies = () => {
       addNotification({
         type: 'error',
         title: 'Refresh Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     } finally {
       setRefreshing(false);
@@ -86,7 +94,8 @@ export const useStrategies = () => {
       addNotification({
         type: 'error',
         title: 'Failed to Load Top Strategies',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       return [];
     }
@@ -115,7 +124,7 @@ export const useStrategies = () => {
   // Search strategies
   const searchStrategies = useCallback((query: string) => {
     const lowercaseQuery = query.toLowerCase();
-    return strategies.filter(strategy => 
+    return strategies.filter(strategy =>
       strategy.name.toLowerCase().includes(lowercaseQuery) ||
       strategy.type.toLowerCase().includes(lowercaseQuery) ||
       strategy.network.toLowerCase().includes(lowercaseQuery)
@@ -127,11 +136,11 @@ export const useStrategies = () => {
     const totalStrategies = strategies.length;
     const activeStrategies = strategies.filter(s => s.isActive).length;
     const totalTvl = strategies.reduce((sum, s) => sum + s.tvl, 0);
-    const averageApy = strategies.length > 0 
-      ? strategies.reduce((sum, s) => sum + s.apy, 0) / strategies.length 
+    const averageApy = strategies.length > 0
+      ? strategies.reduce((sum, s) => sum + s.apy, 0) / strategies.length
       : 0;
-    const averageRisk = strategies.length > 0 
-      ? strategies.reduce((sum, s) => sum + s.riskScore, 0) / strategies.length 
+    const averageRisk = strategies.length > 0
+      ? strategies.reduce((sum, s) => sum + s.riskScore, 0) / strategies.length
       : 0;
 
     const byType = strategies.reduce((acc, strategy) => {
@@ -155,10 +164,12 @@ export const useStrategies = () => {
     };
   }, [strategies]);
 
-  // Load strategies on mount
-  useEffect(() => {
-    fetchStrategies();
-  }, [fetchStrategies]);
+  /*
+    // Load strategies on mount
+    useEffect(() => {
+      fetchStrategies();
+    }, [fetchStrategies]);
+  */
 
   return {
     strategies,

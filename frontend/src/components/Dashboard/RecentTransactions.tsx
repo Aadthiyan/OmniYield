@@ -1,7 +1,9 @@
+"use client";
+
 import React from 'react';
-import { 
-  ArrowUpIcon, 
-  ArrowDownIcon, 
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
   ArrowsRightLeftIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -175,7 +177,7 @@ export const RecentTransactions: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <div className={`text-sm font-semibold ${getTypeColor(transaction.type)}`}>
@@ -186,7 +188,7 @@ export const RecentTransactions: React.FC = () => {
                       {formatCurrency(parseFloat(transaction.amount) / 1e18 * 2000)} {/* Mock ETH price */}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(transaction.status)}
                     <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(transaction.status)}`}>
@@ -204,7 +206,7 @@ export const RecentTransactions: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         <div className="mt-6">
           <button className="w-full btn-secondary">
             View All Transactions

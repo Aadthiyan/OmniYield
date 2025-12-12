@@ -7,8 +7,9 @@ from ..database import get_db
 from ..services.yield_optimizer import YieldOptimizer
 from ..services.yield_data_service import YieldDataService
 from ..services.analytics_service import AnalyticsService
-from ..models import Strategy, UserAnalytics, SystemMetrics, YieldData, UserStrategy
+from ..models import Strategy, UserAnalytics, SystemMetrics, YieldData, UserStrategy, User
 from ..config import settings
+from ..utils.auth import get_current_active_user as get_current_user
 import logging
 import time
 
@@ -117,7 +118,8 @@ async def get_services(db: Session = Depends(get_db)):
 async def optimize_yield(
     request: OptimizeRequest,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Optimize yield allocation across strategies"""
     try:
@@ -144,6 +146,7 @@ async def optimize_yield(
         
         # Optimize
         result = await optimizer.optimize_allocations(
+            user_id=current_user.id,
             total_amount=request.total_amount,
             strategies=strategies,
             risk_tolerance=request.risk_tolerance,
@@ -154,7 +157,7 @@ async def optimize_yield(
         duration = time.time() - start_time
         background_tasks.add_task(
             analytics.log_yield_optimization,
-            user_id=1,  # TODO: Get from auth context
+            user_id=current_user.id,
             protocol="yield_optimizer",
             network="ethereum",
             duration=duration,
@@ -361,7 +364,8 @@ async def get_yield_trends(
 async def rebalance_portfolio(
     request: RebalanceRequest,
     background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Rebalance user portfolio"""
     try:
@@ -369,7 +373,7 @@ async def rebalance_portfolio(
         
         # Get current allocations
         current_allocations = db.query(UserStrategy).filter(
-            UserStrategy.user_id == request.user_id,
+            UserStrategy.user_id == current_user.id,
             UserStrategy.is_active == True
         ).all()
         
@@ -391,7 +395,7 @@ async def rebalance_portfolio(
         
         # Calculate rebalancing actions
         rebalance_actions = await optimizer.rebalance_portfolio(
-            user_id=request.user_id,
+            user_id=current_user.id,
             current_allocations=current,
             target_allocations=target
         )

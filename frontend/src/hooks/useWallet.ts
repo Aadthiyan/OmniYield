@@ -1,41 +1,53 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useStore, useStoreActions } from '@/store';
+import { useStore } from '@/store/useStore';
 import { qieWalletService } from '@/services/qieWalletService';
 import { WalletInfo, QIEWallet, QIETransaction, QIETransactionResult } from '@/types';
 
 export const useWallet = () => {
-  const { wallet, isWalletConnected } = useStore();
-  const { setWallet, setWalletConnected, setError, addNotification } = useStoreActions();
+  const wallet = useStore((state) => state.wallet);
+  const isWalletConnected = useStore((state) => state.isWalletConnected);
+  const setWallet = useStore((state) => state.setWallet);
+  const setWalletConnected = useStore((state) => state.setWalletConnected);
+  const setError = useStore((state) => state.setError);
+  const addNotification = useStore((state) => state.addNotification);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-  // Connect wallet
+
+  // Connect wallet (simplified for development)
   const connectWallet = useCallback(async (type: 'privateKey' | 'mnemonic' | 'hardware' = 'privateKey') => {
     try {
       setIsConnecting(true);
       setError(null);
 
-      const qieWallet = await qieWalletService.connectWallet(type);
-      const walletInfo = await qieWalletService.getWalletInfo();
+      // For development: Use mock wallet data
+      const mockWalletInfo: WalletInfo = {
+        address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+        balance: '1000000000000000000', // 1 ETH
+        network: 'ethereum',
+        chainId: 1,
+        isConnected: true
+      };
 
-      if (walletInfo) {
-        setWallet(walletInfo);
-        setWalletConnected(true);
-        addNotification({
-          type: 'success',
-          title: 'Wallet Connected',
-          message: `Successfully connected to wallet ${walletInfo.address.slice(0, 6)}...${walletInfo.address.slice(-4)}`
-        });
-      } else {
-        throw new Error('Failed to get wallet information');
-      }
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setWallet(mockWalletInfo);
+      setWalletConnected(true);
+      addNotification({
+        type: 'success',
+        title: 'Wallet Connected',
+        message: `Successfully connected to wallet ${mockWalletInfo.address.slice(0, 6)}...${mockWalletInfo.address.slice(-4)}`,
+        read: false
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to connect wallet';
       setError(errorMessage);
       addNotification({
         type: 'error',
         title: 'Connection Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       throw error;
     } finally {
@@ -55,7 +67,8 @@ export const useWallet = () => {
       addNotification({
         type: 'info',
         title: 'Wallet Disconnected',
-        message: 'Wallet has been disconnected successfully'
+        message: 'Wallet has been disconnected successfully',
+        read: false
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to disconnect wallet';
@@ -63,7 +76,8 @@ export const useWallet = () => {
       addNotification({
         type: 'error',
         title: 'Disconnection Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
     } finally {
       setIsDisconnecting(false);
@@ -93,11 +107,12 @@ export const useWallet = () => {
     try {
       setError(null);
       const result = await qieWalletService.sendTransaction(transaction);
-      
+
       addNotification({
         type: 'success',
         title: 'Transaction Sent',
-        message: `Transaction ${result.hash.slice(0, 10)}... has been sent`
+        message: `Transaction ${result.hash.slice(0, 10)}... has been sent`,
+        read: false
       });
 
       return result;
@@ -107,7 +122,8 @@ export const useWallet = () => {
       addNotification({
         type: 'error',
         title: 'Transaction Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       throw error;
     }
@@ -145,7 +161,8 @@ export const useWallet = () => {
       addNotification({
         type: 'success',
         title: 'Network Switched',
-        message: `Switched to ${network} network`
+        message: `Switched to ${network} network`,
+        read: false
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to switch network';
@@ -153,7 +170,8 @@ export const useWallet = () => {
       addNotification({
         type: 'error',
         title: 'Network Switch Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       throw error;
     }
@@ -167,7 +185,8 @@ export const useWallet = () => {
       addNotification({
         type: 'success',
         title: 'Token Added',
-        message: `${symbol} has been added to your wallet`
+        message: `${symbol} has been added to your wallet`,
+        read: false
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to add token';
@@ -175,7 +194,8 @@ export const useWallet = () => {
       addNotification({
         type: 'error',
         title: 'Add Token Failed',
-        message: errorMessage
+        message: errorMessage,
+        read: false
       });
       throw error;
     }

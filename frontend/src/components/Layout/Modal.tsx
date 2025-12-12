@@ -1,6 +1,8 @@
+"use client";
+
 import React from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useStore, useStoreActions } from '@/store';
+// import { useStore } from '@/store/useStore'; // unused if we just use props
 import { ConnectWalletModal } from './ConnectWalletModal';
 import { OptimizeModal } from './OptimizeModal';
 import { RebalanceModal } from './RebalanceModal';
@@ -15,12 +17,9 @@ interface ModalProps {
 }
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, type, data, onClose }) => {
-  const { setUI } = useStoreActions();
-
   if (!isOpen) return null;
 
   const handleClose = () => {
-    setUI({ modal: { isOpen: false } });
     onClose();
   };
 
@@ -44,11 +43,11 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, type, data, onClose }) => 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity"
         onClick={handleClose}
       />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -59,7 +58,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, type, data, onClose }) => 
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
-          
+
           {/* Content */}
           {renderModalContent()}
         </div>

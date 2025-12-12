@@ -45,6 +45,12 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 80001,
     },
+    // QIE network - configure via .env: QIE_RPC_URL and QIE_CHAIN_ID
+    qie: {
+      url: process.env.QIE_RPC_URL || "https://qie-rpc.example",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: process.env.QIE_CHAIN_ID ? Number(process.env.QIE_CHAIN_ID) : 9999,
+    },
   },
   etherscan: {
     apiKey: {

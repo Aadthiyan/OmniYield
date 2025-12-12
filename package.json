@@ -13,6 +13,7 @@
     "deploy:testnet": "hardhat run scripts/deploy.js --network testnet",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
     "deploy:ethereum": "hardhat run scripts/deploy.js --network ethereum",
+    "deploy:qie": "hardhat run scripts/deploy.js --network qie",
     "node": "hardhat node",
     "clean": "hardhat clean",
     "verify": "hardhat verify",
@@ -40,20 +41,23 @@
     "ethers": "^6.8.0",
     "express": "^4.18.2",
     "joi": "^17.11.0",
+    "next": "^16.0.9",
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
     "web3": "^4.2.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@types/node": "^20.8.0",
-    "hardhat": "^2.19.0",
-    "nodemon": "^3.0.1",
-    "typescript": "^5.2.2",
     "eslint": "^8.52.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.0",
-    "solidity-coverage": "^0.8.5"
+    "hardhat": "^2.19.0",
+    "nodemon": "^3.0.1",
+    "solidity-coverage": "^0.8.5",
+    "typescript": "^5.2.2"
   }
 }

@@ -119,6 +119,7 @@ class YieldOptimizer:
     
     async def optimize_allocations(
         self, 
+        user_id: int,
         total_amount: int, 
         strategies: List[Dict[str, Any]], 
         risk_tolerance: float = 0.5,
@@ -153,7 +154,7 @@ class YieldOptimizer:
             
             # Save optimization result
             optimization_result = OptimizationResult(
-                user_id=1,  # TODO: Get from auth context
+                user_id=user_id,
                 total_amount=total_amount,
                 optimal_allocations=optimal_allocations,
                 expected_apy=expected_apy,

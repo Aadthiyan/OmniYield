@@ -1,11 +1,13 @@
 import React from 'react';
 import { XMarkIcon, BellIcon } from '@heroicons/react/24/outline';
-import { useStore, useStoreActions } from '@/store';
+import { useStore } from '@/store/useStore';
 import { formatRelativeTime } from '@/utils/formatters';
 
 export const NotificationCenter: React.FC = () => {
-  const { ui } = useStore();
-  const { removeNotification, markNotificationAsRead, clearNotifications } = useStoreActions();
+  const ui = useStore((state) => state.ui);
+  const removeNotification = useStore((state) => state.removeNotification);
+  const markNotificationAsRead = useStore((state) => state.markNotificationAsRead);
+  const clearNotifications = useStore((state) => state.clearNotifications);
 
   const unreadCount = ui.notifications.filter(n => !n.read).length;
 
@@ -38,7 +40,7 @@ export const NotificationCenter: React.FC = () => {
                   ${notification.type === 'info' ? 'text-blue-400' : ''}
                 `} />
               </div>
-              
+
               <div className="ml-3 flex-1">
                 <h4 className={`
                   text-sm font-medium
@@ -49,7 +51,7 @@ export const NotificationCenter: React.FC = () => {
                 `}>
                   {notification.title}
                 </h4>
-                
+
                 <p className={`
                   mt-1 text-sm
                   ${notification.type === 'success' ? 'text-green-700 dark:text-green-300' : ''}
@@ -59,12 +61,12 @@ export const NotificationCenter: React.FC = () => {
                 `}>
                   {notification.message}
                 </p>
-                
+
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {formatRelativeTime(notification.timestamp)}
                   </span>
-                  
+
                   {notification.action && (
                     <button
                       onClick={notification.action.onClick}
@@ -81,7 +83,7 @@ export const NotificationCenter: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="ml-4 flex-shrink-0">
                 <button
                   onClick={() => removeNotification(notification.id)}
@@ -93,7 +95,7 @@ export const NotificationCenter: React.FC = () => {
             </div>
           </div>
         ))}
-        
+
         {unreadCount > 0 && (
           <div className="flex justify-end">
             <button

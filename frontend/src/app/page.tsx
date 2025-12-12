@@ -1,39 +1,29 @@
-import React from 'react';
-import { DashboardLayout } from '@/components/Layout/DashboardLayout';
-import { PortfolioOverview } from '@/components/Dashboard/PortfolioOverview';
-import { PortfolioChart } from '@/components/Dashboard/PortfolioChart';
-import { StrategiesList } from '@/components/Dashboard/StrategiesList';
-import { RecentTransactions } from '@/components/Dashboard/RecentTransactions';
+"use client";
 
-export default function DashboardPage() {
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useStore } from '@/store/useStore';
+
+export default function HomePage() {
+  const router = useRouter();
+  const user = useStore((state) => state.user);
+
+  useEffect(() => {
+    // Redirect based on authentication status
+    if (user) {
+      router.push('/dashboard');
+    } else {
+      router.push('/landing');
+    }
+  }, [user, router]);
+
+  // Show loading while redirecting
   return (
-    <DashboardLayout>
-      <div className="space-y-8">
-        {/* Page header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Monitor your DeFi yield farming strategies and portfolio performance
-          </p>
-        </div>
-
-        {/* Portfolio overview */}
-        <PortfolioOverview />
-
-        {/* Charts */}
-        <PortfolioChart />
-
-        {/* Bottom section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Strategies */}
-          <StrategiesList />
-          
-          {/* Recent transactions */}
-          <RecentTransactions />
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-purple-950 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

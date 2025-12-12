@@ -99,7 +99,7 @@ class QIESDK {
         hash: tx.hash,
         status: receipt ? 'confirmed' : 'pending',
         blockNumber: receipt?.blockNumber,
-        gasUsed: receipt?.gasUsed.toString(),
+        gasUsed: receipt?.gasUsed ? Number(receipt.gasUsed) : undefined,
         receipt
       };
     } catch (error) {

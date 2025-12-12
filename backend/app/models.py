@@ -11,17 +11,34 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    wallet_address = Column(String(42), unique=True, index=True, nullable=False)
-    email = Column(String(255), unique=True, index=True, nullable=True)
+    # Traditional auth fields
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    
+    # Optional wallet connection
+    wallet_address = Column(String(42), unique=True, index=True, nullable=True)
+    
+    # Account status
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String(255), nullable=True)
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
+    
+    # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    is_active = Column(Boolean, default=True)
+    last_login = Column(DateTime(timezone=True), nullable=True)
+    
+    # User preferences
     preferences = Column(JSON, default={})
     
     # Relationships
     strategies = relationship("UserStrategy", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
     analytics = relationship("UserAnalytics", back_populates="user")
+
 
 
 class Strategy(Base):

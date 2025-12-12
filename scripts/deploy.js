@@ -7,6 +7,9 @@ async function main() {
 
   // Get the deployer account
   const [deployer] = await ethers.getSigners();
+  if (!deployer) {
+    throw new Error("No deployer account available. Make sure PRIVATE_KEY is set in your .env or accounts are configured in hardhat.config.js");
+  }
   console.log("Deploying contracts with account:", deployer.address);
   console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
 

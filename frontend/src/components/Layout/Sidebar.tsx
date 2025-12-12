@@ -1,10 +1,12 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { 
-  HomeIcon, 
-  ChartBarIcon, 
-  WalletIcon, 
+import { usePathname } from 'next/navigation';
+import {
+  HomeIcon,
+  ChartBarIcon,
+  WalletIcon,
   CogIcon,
   ArrowRightOnRectangleIcon,
   XMarkIcon,
@@ -12,7 +14,7 @@ import {
   ArrowsRightLeftIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
-import { useStore, useStoreActions } from '@/store';
+import { useStore, useStoreActions } from '@/store/useStore';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -30,13 +32,14 @@ const navigation = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const router = useRouter();
-  const { wallet, isWalletConnected } = useStore();
-  const { disconnectWallet } = useStoreActions();
+  const pathname = usePathname();
+  const wallet = useStore((state) => state.wallet);
+  const isWalletConnected = useStore((state) => state.isWalletConnected);
+  const setWallet = useStore((state) => state.setWallet);
 
   const handleDisconnect = async () => {
     try {
-      await disconnectWallet();
+      setWallet(null);
     } catch (error) {
       console.error('Failed to disconnect wallet:', error);
     }
@@ -46,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* Mobile backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
           onClick={onClose}
         />
@@ -55,8 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static lg:inset-0
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -80,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
             {navigation.map((item) => {
-              const isActive = router.pathname === item.href;
+              const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.name}
