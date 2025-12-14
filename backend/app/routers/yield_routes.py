@@ -22,6 +22,18 @@ class StrategyWeight(BaseModel):
     weight: float = Field(..., ge=0.0, le=1.0)
 
 
+class CreateStrategyRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    type: str = Field(..., min_length=1)  # compound, uniswap_v3, lending, staking, etc.
+    contract_address: str = Field(..., min_length=42, max_length=42)  # Ethereum address
+    network: str = Field(..., min_length=1)  # ethereum, polygon, bsc, etc.
+    apy: float = Field(..., ge=0.0)
+    tvl: int = Field(default=0, ge=0)
+    risk_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    is_active: bool = True
+    meta_data: Dict[str, Any] = {}
+
+
 class OptimizeRequest(BaseModel):
     total_amount: int = Field(..., gt=0)
     strategies: List[StrategyWeight]
@@ -214,6 +226,62 @@ async def get_strategies(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@router.post("/strategies", response_model=StrategyResponse)
+async def create_strategy(
+    request: CreateStrategyRequest,
+    db: Session = Depends(get_db)
+):
+    """Create a new strategy (admin only)"""
+    try:
+        # Check if strategy already exists
+        existing = db.query(Strategy).filter(
+            Strategy.contract_address == request.contract_address
+        ).first()
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Strategy with this contract address already exists")
+        
+        # Create new strategy
+        new_strategy = Strategy(
+            name=request.name,
+            type=request.type,
+            contract_address=request.contract_address,
+            network=request.network,
+            apy=request.apy,
+            tvl=request.tvl,
+            risk_score=request.risk_score,
+            is_active=request.is_active,
+            meta_data=request.meta_data
+        )
+        
+        db.add(new_strategy)
+        db.commit()
+        db.refresh(new_strategy)
+        
+        logger.info(f"Created new strategy: {new_strategy.name} ({new_strategy.id})")
+        
+        return StrategyResponse(
+            id=new_strategy.id,
+            name=new_strategy.name,
+            type=new_strategy.type,
+            contract_address=new_strategy.contract_address,
+            network=new_strategy.network,
+            apy=new_strategy.apy,
+            tvl=new_strategy.tvl,
+            risk_score=new_strategy.risk_score,
+            is_active=new_strategy.is_active,
+            created_at=new_strategy.created_at,
+            updated_at=new_strategy.updated_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to create strategy: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
 @router.get("/strategies/{strategy_id}", response_model=StrategyResponse)
 async def get_strategy(strategy_id: int, db: Session = Depends(get_db)):
     """Get specific strategy details"""
@@ -241,6 +309,55 @@ async def get_strategy(strategy_id: int, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         logger.error(f"Failed to get strategy: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.put("/strategies/{strategy_id}", response_model=StrategyResponse)
+async def update_strategy(
+    strategy_id: int,
+    request: CreateStrategyRequest,
+    db: Session = Depends(get_db)
+):
+    """Update an existing strategy"""
+    try:
+        strategy = db.query(Strategy).filter(Strategy.id == strategy_id).first()
+        
+        if not strategy:
+            raise HTTPException(status_code=404, detail="Strategy not found")
+        
+        # Update fields
+        strategy.name = request.name
+        strategy.type = request.type
+        strategy.apy = request.apy
+        strategy.tvl = request.tvl
+        strategy.risk_score = request.risk_score
+        strategy.is_active = request.is_active
+        strategy.meta_data = request.meta_data
+        
+        db.commit()
+        db.refresh(strategy)
+        
+        logger.info(f"Updated strategy: {strategy.name} ({strategy.id})")
+        
+        return StrategyResponse(
+            id=strategy.id,
+            name=strategy.name,
+            type=strategy.type,
+            contract_address=strategy.contract_address,
+            network=strategy.network,
+            apy=strategy.apy,
+            tvl=strategy.tvl,
+            risk_score=strategy.risk_score,
+            is_active=strategy.is_active,
+            created_at=strategy.created_at,
+            updated_at=strategy.updated_at
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to update strategy: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 

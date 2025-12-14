@@ -76,6 +76,16 @@ class ApiService {
     return response.data;
   }
 
+  async createStrategy(strategyData: any): Promise<Strategy> {
+    const response = await this.api.post('/api/v1/yield/strategies', strategyData);
+    return response.data;
+  }
+
+  async updateStrategy(strategyId: number, strategyData: any): Promise<Strategy> {
+    const response = await this.api.put(`/api/v1/yield/strategies/${strategyId}`, strategyData);
+    return response.data;
+  }
+
   // Yield data
   async getYieldData(strategyId?: number, network?: string, days: number = 7): Promise<YieldData[]> {
     const params = new URLSearchParams();
