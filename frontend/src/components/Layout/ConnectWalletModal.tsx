@@ -52,7 +52,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ onClose 
           Connect Wallet
         </h2>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Choose how you'd like to connect your wallet to the DeFi Yield Aggregator
+          Choose how you&apos;d like to connect your wallet to the DeFi Yield Aggregator
         </p>
       </div>
 
