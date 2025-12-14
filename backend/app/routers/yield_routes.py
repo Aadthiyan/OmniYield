@@ -204,26 +204,33 @@ async def get_strategies(
         
         strategies = query.order_by(Strategy.apy.desc()).all()
         
-        return [
-            StrategyResponse(
-                id=strategy.id,
-                name=strategy.name,
-                type=strategy.type,
-                contract_address=strategy.contract_address,
-                network=strategy.network,
-                apy=strategy.apy,
-                tvl=strategy.tvl,
-                risk_score=strategy.risk_score,
-                is_active=strategy.is_active,
-                created_at=strategy.created_at,
-                updated_at=strategy.updated_at
-            )
-            for strategy in strategies
-        ]
+        response_strategies = []
+        for strategy in strategies:
+            try:
+                response_strategies.append(
+                    StrategyResponse(
+                        id=strategy.id,
+                        name=strategy.name,
+                        type=strategy.type,
+                        contract_address=strategy.contract_address,
+                        network=strategy.network,
+                        apy=float(strategy.apy),
+                        tvl=int(strategy.tvl),
+                        risk_score=float(strategy.risk_score),
+                        is_active=strategy.is_active,
+                        created_at=strategy.created_at,
+                        updated_at=strategy.updated_at
+                    )
+                )
+            except Exception as strategy_error:
+                logger.error(f"Error converting strategy {strategy.id}: {strategy_error}")
+                raise
+        
+        return response_strategies
         
     except Exception as e:
-        logger.error(f"Failed to get strategies: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error(f"Failed to get strategies: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to get strategies: {str(e)}")
 
 
 @router.post("/strategies", response_model=StrategyResponse)
