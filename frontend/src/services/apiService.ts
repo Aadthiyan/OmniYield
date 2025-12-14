@@ -68,22 +68,81 @@ class ApiService {
     if (activeOnly) params.append('active_only', 'true');
 
     const response = await this.api.get(`/api/v1/yield/strategies?${params}`);
-    return response.data;
+    // Transform snake_case to camelCase
+    return response.data.map((strategy: any) => ({
+      id: strategy.id,
+      name: strategy.name,
+      type: strategy.type,
+      contractAddress: strategy.contract_address,
+      network: strategy.network,
+      apy: strategy.apy,
+      tvl: strategy.tvl,
+      riskScore: strategy.risk_score,
+      isActive: strategy.is_active,
+      createdAt: strategy.created_at,
+      updatedAt: strategy.updated_at,
+      metadata: strategy.meta_data
+    }));
   }
 
   async getStrategy(strategyId: number): Promise<Strategy> {
     const response = await this.api.get(`/api/v1/yield/strategies/${strategyId}`);
-    return response.data;
+    // Transform snake_case to camelCase
+    const strategy = response.data;
+    return {
+      id: strategy.id,
+      name: strategy.name,
+      type: strategy.type,
+      contractAddress: strategy.contract_address,
+      network: strategy.network,
+      apy: strategy.apy,
+      tvl: strategy.tvl,
+      riskScore: strategy.risk_score,
+      isActive: strategy.is_active,
+      createdAt: strategy.created_at,
+      updatedAt: strategy.updated_at,
+      metadata: strategy.meta_data
+    };
   }
 
   async createStrategy(strategyData: any): Promise<Strategy> {
     const response = await this.api.post('/api/v1/yield/strategies', strategyData);
-    return response.data;
+    // Transform snake_case to camelCase
+    const strategy = response.data;
+    return {
+      id: strategy.id,
+      name: strategy.name,
+      type: strategy.type,
+      contractAddress: strategy.contract_address,
+      network: strategy.network,
+      apy: strategy.apy,
+      tvl: strategy.tvl,
+      riskScore: strategy.risk_score,
+      isActive: strategy.is_active,
+      createdAt: strategy.created_at,
+      updatedAt: strategy.updated_at,
+      metadata: strategy.meta_data
+    };
   }
 
   async updateStrategy(strategyId: number, strategyData: any): Promise<Strategy> {
     const response = await this.api.put(`/api/v1/yield/strategies/${strategyId}`, strategyData);
-    return response.data;
+    // Transform snake_case to camelCase
+    const strategy = response.data;
+    return {
+      id: strategy.id,
+      name: strategy.name,
+      type: strategy.type,
+      contractAddress: strategy.contract_address,
+      network: strategy.network,
+      apy: strategy.apy,
+      tvl: strategy.tvl,
+      riskScore: strategy.risk_score,
+      isActive: strategy.is_active,
+      createdAt: strategy.created_at,
+      updatedAt: strategy.updated_at,
+      metadata: strategy.meta_data
+    };
   }
 
   // Yield data

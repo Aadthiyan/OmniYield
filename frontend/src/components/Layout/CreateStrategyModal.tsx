@@ -150,8 +150,11 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
         meta_data: {}
       });
 
-      onSuccess();
-      onClose();
+      // Small delay to ensure backend processing, then refresh and close
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 800);
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to create strategy';
       setError(errorMsg);
