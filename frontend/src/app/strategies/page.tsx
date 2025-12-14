@@ -180,7 +180,10 @@ export default function StrategiesPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="card"> mb-6">
+                    <div className="card">
+                        <div className="card-body text-center py-12">
+                            <FunnelIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">
                                 No strategies match your filters. Try adjusting your search criteria.
                             </p>
                             <a 
@@ -193,10 +196,7 @@ export default function StrategiesPage() {
                                 }}
                             >
                                 Browse Strategies
-                            </annelIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-600 dark:text-gray-400">
-                                No strategies match your filters. Try adjusting your search criteria.
-                            </p>
+                            </a>
                         </div>
                     </div>
                 )}
