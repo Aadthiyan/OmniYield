@@ -7,7 +7,7 @@ import { apiService } from '@/services/apiService';
 
 export const useAuth = () => {
     const router = useRouter();
-    const { signOut } = useClerkAuth();
+    const { signOut, getToken } = useClerkAuth();
     const { user: clerkUser, isLoaded } = useUser();
     const setUser = useStore((state) => state.setUser);
     const setWallet = useStore((state) => state.setWallet);
@@ -54,9 +54,6 @@ export const useAuth = () => {
             setIsLoading(true);
             setError(null);
 
-            // Get Clerk token for authentication with backend
-            const token = await clerkUser?.getIdToken();
-
             // Use apiService method with Clerk authentication
             await apiService.connectWallet({
                 walletAddress,
@@ -91,7 +88,7 @@ export const useAuth = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [clerkUser, setWallet, setWalletConnected, addNotification]);
+    }, [setWallet, setWalletConnected, addNotification]);
 
     const logout = useCallback(async () => {
         try {
