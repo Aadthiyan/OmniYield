@@ -29,6 +29,16 @@ export default function BridgePage() {
         setDestChain(temp);
     };
 
+    const handleBridgeAssets = () => {
+        if (!amount || parseFloat(amount) <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        console.log('Bridging', amount, 'ETH from', sourceChain, 'to', destChain);
+        // TODO: Implement bridge logic with backend
+        alert(`Bridge transaction initiated: ${amount} ETH from ${sourceChain} to ${destChain}`);
+    };
+
     return (
         <DashboardLayout>
             <div className="space-y-8">
@@ -119,6 +129,7 @@ export default function BridgePage() {
 
                                 {/* Bridge Button */}
                                 <button
+                                    onClick={handleBridgeAssets}
                                     className="w-full btn-primary py-3 text-lg"
                                     disabled={!amount || parseFloat(amount) <= 0}
                                 >

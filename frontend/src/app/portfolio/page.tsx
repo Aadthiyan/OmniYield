@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/Auth/ProtectedRoute';
 import { usePortfolio } from '@/hooks/usePortfolio';
@@ -15,6 +16,7 @@ import {
 import { formatCurrency, formatPercentage, formatTokenAmount } from '@/utils/formatters';
 
 export default function PortfolioPage() {
+    const router = useRouter();
     const { optimizePortfolio } = usePortfolio();
     const userStrategies = useStore((state) => state.userStrategies);
     const portfolioSummary = useStore((state) => state.portfolioSummary);
@@ -23,6 +25,10 @@ export default function PortfolioPage() {
     const totalValue = Number(portfolioSummary?.totalValue || 0);
     const totalYield = Number(portfolioSummary?.totalYield || 0);
     const averageApy = 0.05; // Mock APY for now
+
+    const handleBrowseStrategies = () => {
+        router.push('/strategies');
+    };
 
     return (
         <ProtectedRoute>
@@ -153,7 +159,10 @@ export default function PortfolioPage() {
                                     <p className="text-gray-600 dark:text-gray-400">
                                         No positions yet. Start investing in strategies to see them here.
                                     </p>
-                                    <button className="btn-primary mt-4">
+                                    <button 
+                                        onClick={handleBrowseStrategies}
+                                        className="btn-primary mt-4"
+                                    >
                                         Browse Strategies
                                     </button>
                                 </div>

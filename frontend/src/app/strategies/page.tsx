@@ -36,6 +36,12 @@ export default function StrategiesPage() {
         return matchesSearch && matchesNetwork && matchesApy && strategy.isActive;
     });
 
+    const handleInvestStrategy = (strategyId: number, strategyName: string) => {
+        console.log('Investing in strategy:', strategyId, strategyName);
+        // TODO: Implement investment logic with backend
+        alert(`Investment initiated for ${strategyName}`);
+    };
+
     return (
         <DashboardLayout>
             <div className="space-y-8">
@@ -163,7 +169,10 @@ export default function StrategiesPage() {
                                     </div>
 
                                     {/* Action Button */}
-                                    <button className="w-full btn-primary">
+                                    <button 
+                                        onClick={() => handleInvestStrategy(strategy.id, strategy.name)}
+                                        className="w-full btn-primary"
+                                    >
                                         Invest in Strategy
                                     </button>
                                 </div>
@@ -171,9 +180,20 @@ export default function StrategiesPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="card">
-                        <div className="card-body text-center py-12">
-                            <FunnelIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <div className="card"> mb-6">
+                                No strategies match your filters. Try adjusting your search criteria.
+                            </p>
+                            <a 
+                                href="/strategies"
+                                className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+                                onClick={() => {
+                                    setSearchTerm('');
+                                    setSelectedNetwork('all');
+                                    setMinApy(0);
+                                }}
+                            >
+                                Browse Strategies
+                            </annelIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                             <p className="text-gray-600 dark:text-gray-400">
                                 No strategies match your filters. Try adjusting your search criteria.
                             </p>
