@@ -44,9 +44,9 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
     type: 'lending',
     contract_address: '',
     network: 'ethereum',
-    apy: '',
-    tvl: '',
-    risk_score: '',
+    apy: 0,
+    tvl: 0,
+    risk_score: 0,
     is_active: true,
     meta_data: {}
   });
@@ -143,9 +143,9 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
         type: 'lending',
         contract_address: '',
         network: 'ethereum',
-        apy: '',
-        tvl: '',
-        risk_score: '',
+        apy: 0,
+        tvl: 0,
+        risk_score: 0,
         is_active: true,
         meta_data: {}
       });
