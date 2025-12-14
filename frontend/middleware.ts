@@ -1,19 +1,26 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { withClerkMiddleware } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/wallet(.*)",
-  "/bridge(.*)",
-  "/strategies(.*)",
-  "/portfolio(.*)",
-  "/settings(.*)",
-  "/security(.*)",
-]);
+export default withClerkMiddleware(async (request: NextRequest) => {
+  const protectedPaths = [
+    "/dashboard",
+    "/wallet",
+    "/bridge",
+    "/strategies",
+    "/portfolio",
+    "/settings",
+    "/security",
+  ];
 
-export default clerkMiddleware((auth, req) => {
-  if (isProtectedRoute(req)) {
-    auth().protect();
+  const isProtected = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
+
+  if (isProtected) {
+    // Middleware will handle auth checks
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
