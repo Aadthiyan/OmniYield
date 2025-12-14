@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { useStrategies } from '@/hooks/useStrategies';
 import { useStore } from '@/store/useStore';
+import { CreateStrategyModal } from '@/components/Layout/CreateStrategyModal';
 import {
     MagnifyingGlassIcon,
     FunnelIcon,
     SparklesIcon,
-    ShieldCheckIcon
+    ShieldCheckIcon,
+    PlusIcon
 } from '@heroicons/react/24/outline';
 import { formatPercentage, formatCurrency, formatRiskScore, getRiskColor } from '@/utils/formatters';
 import { Network } from '@/types';
@@ -21,6 +23,7 @@ export default function StrategiesPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedNetwork, setSelectedNetwork] = useState<Network | 'all'>('all');
     const [minApy, setMinApy] = useState(0);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
         fetchStrategies();
@@ -36,14 +39,23 @@ export default function StrategiesPage() {
     return (
         <DashboardLayout>
             <div className="space-y-8">
-                {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        Strategies
-                    </h1>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
-                        Explore and invest in the best yield farming strategies
-                    </p>
+                {/* Header with Create Button */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                            Strategies
+                        </h1>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">
+                            Explore and invest in the best yield farming strategies
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                        <PlusIcon className="w-5 h-5" />
+                        Create Strategy
+                    </button>
                 </div>
 
                 {/* Filters */}
@@ -168,6 +180,13 @@ export default function StrategiesPage() {
                         </div>
                     </div>
                 )}
+
+                {/* Create Strategy Modal */}
+                <CreateStrategyModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSuccess={() => fetchStrategies()}
+                />
             </div>
         </DashboardLayout>
     );
