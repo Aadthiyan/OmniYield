@@ -27,7 +27,19 @@ export const useAuth = () => {
                 email: clerkUser.primaryEmailAddress?.emailAddress || '',
                 walletAddress: undefined,
                 isActive: true,
-                preferences: {},
+                preferences: {
+                    theme: 'system',
+                    currency: 'USD',
+                    notifications: {
+                        email: true,
+                        push: true,
+                        yieldAlerts: true,
+                        riskAlerts: true,
+                        transactionUpdates: true
+                    },
+                    riskTolerance: 0.5,
+                    defaultSlippage: 0.01
+                },
                 createdAt: clerkUser.createdAt?.toISOString() || new Date().toISOString(),
                 updatedAt: clerkUser.updatedAt?.toISOString() || new Date().toISOString()
             };
