@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     NODE_ENV: str = "development"
     DEBUG: bool = False
     
+    # Clerk Authentication
+    CLERK_SECRET_KEY: Optional[str] = None
+    
     # Database
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/yield_aggregator"
     DATABASE_POOL_SIZE: int = 10

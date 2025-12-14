@@ -1,25 +1,14 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth as useClerkAuth, useUser } from '@clerk/nextjs';
 import { useStore } from '@/store/useStore';
-import { User, LoginRequest, SignupRequest, ConnectWalletRequest } from '@/types';
+import { User, ConnectWalletRequest } from '@/types';
 import { apiService } from '@/services/apiService';
-
-// API URL (should be in env vars in production)
-const API_URL = 'http://localhost:8000/api/auth';
-
-interface LoginCredentials {
-    email: string;
-    password: string;
-}
-
-interface SignUpCredentials {
-    name: string;
-    email: string;
-    password: string;
-}
 
 export const useAuth = () => {
     const router = useRouter();
+    const { signOut } = useClerkAuth();
+    const { user: clerkUser, isLoaded } = useUser();
     const setUser = useStore((state) => state.setUser);
     const setWallet = useStore((state) => state.setWallet);
     const setWalletConnected = useStore((state) => state.setWalletConnected);
@@ -27,119 +16,36 @@ export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const login = useCallback(async (credentials: LoginCredentials) => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            // Use new apiService method
-            const response = await apiService.login({
-                email: credentials.email,
-                password: credentials.password
-            } as LoginRequest);
-
-            // Transform backend user to frontend user type
+    // Sync Clerk user to store
+    useEffect(() => {
+        if (isLoaded && clerkUser) {
             const user: User = {
-                id: response.user.id.toString(),
-                name: response.user.name,
-                email: response.user.email,
-                walletAddress: response.user.walletAddress,
-                isActive: response.user.isActive,
-                preferences: response.user.preferences,
-                createdAt: response.user.createdAt,
-                updatedAt: response.user.updatedAt
+                id: clerkUser.id,
+                name: clerkUser.firstName && clerkUser.lastName 
+                    ? `${clerkUser.firstName} ${clerkUser.lastName}`
+                    : clerkUser.username || 'User',
+                email: clerkUser.primaryEmailAddress?.emailAddress || '',
+                walletAddress: undefined,
+                isActive: true,
+                preferences: {},
+                createdAt: clerkUser.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: clerkUser.updatedAt?.toISOString() || new Date().toISOString()
             };
-
             setUser(user);
-
-            // If user has a wallet connected, restore it
-            if (user.walletAddress) {
-                setWallet({
-                    address: user.walletAddress,
-                    balance: '0', // Would need to fetch
-                    network: 'ethereum',
-                    chainId: 1,
-                    isConnected: true
-                });
-                setWalletConnected(true);
-            }
-
-            addNotification({
-                type: 'success',
-                title: 'Welcome back!',
-                message: `Successfully logged in as ${user.name}`,
-                read: false
-            });
-
-            router.push('/dashboard');
-        } catch (err: any) {
-            const errorMsg = err.message || 'Login failed';
-            setError(errorMsg);
-            addNotification({
-                type: 'error',
-                title: 'Login Failed',
-                message: errorMsg,
-                read: false
-            });
-        } finally {
-            setIsLoading(false);
+        } else if (isLoaded && !clerkUser) {
+            setUser(null);
         }
-    }, [setUser, setWallet, setWalletConnected, addNotification, router]);
-
-    const signup = useCallback(async (credentials: SignUpCredentials) => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            // Use new apiService method
-            const response = await apiService.signup({
-                name: credentials.name,
-                email: credentials.email,
-                password: credentials.password
-            } as SignupRequest);
-
-            // Transform backend user to frontend user type
-            const user: User = {
-                id: response.user.id.toString(),
-                name: response.user.name,
-                email: response.user.email,
-                walletAddress: response.user.walletAddress,
-                isActive: response.user.isActive,
-                preferences: response.user.preferences,
-                createdAt: response.user.createdAt,
-                updatedAt: response.user.updatedAt
-            };
-
-            setUser(user);
-
-            addNotification({
-                type: 'success',
-                title: 'Account Created',
-                message: 'Welcome to YieldX! Your account has been created.',
-                read: false
-            });
-
-            router.push('/dashboard');
-        } catch (err: any) {
-            const errorMsg = err.message || 'Sign up failed';
-            setError(errorMsg);
-            addNotification({
-                type: 'error',
-                title: 'Sign Up Failed',
-                message: errorMsg,
-                read: false
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    }, [setUser, addNotification, router]);
+    }, [isLoaded, clerkUser, setUser]);
 
     const connectWallet = useCallback(async (walletAddress: string, signature?: string) => {
         try {
             setIsLoading(true);
             setError(null);
 
-            // Use new apiService method
+            // Get Clerk token for authentication with backend
+            const token = await clerkUser?.getIdToken();
+
+            // Use apiService method with Clerk authentication
             await apiService.connectWallet({
                 walletAddress,
                 signature
@@ -148,7 +54,7 @@ export const useAuth = () => {
             // Update wallet in store
             setWallet({
                 address: walletAddress,
-                balance: '0', // Would need to fetch
+                balance: '0',
                 network: 'ethereum',
                 chainId: 1,
                 isConnected: true
@@ -173,29 +79,42 @@ export const useAuth = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [setWallet, setWalletConnected, addNotification]);
+    }, [clerkUser, setWallet, setWalletConnected, addNotification]);
 
-    const logout = useCallback(() => {
-        apiService.logout();
-        setUser(null);
-        setWallet(null);
-        setWalletConnected(false);
-        router.push('/login');
+    const logout = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            await signOut();
+            setUser(null);
+            setWallet(null);
+            setWalletConnected(false);
+            router.push('/');
 
-        addNotification({
-            type: 'info',
-            title: 'Logged Out',
-            message: 'You have been successfully logged out.',
-            read: false
-        });
-    }, [setUser, setWallet, setWalletConnected, router, addNotification]);
+            addNotification({
+                type: 'info',
+                title: 'Logged Out',
+                message: 'You have been successfully logged out.',
+                read: false
+            });
+        } catch (err: any) {
+            const errorMsg = err.message || 'Logout failed';
+            setError(errorMsg);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [signOut, setUser, setWallet, setWalletConnected, router, addNotification]);
 
     return {
-        login,
-        signup,
         connectWallet,
         logout,
         isLoading,
-        error
+        error,
+        user: clerkUser ? {
+            id: clerkUser.id,
+            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+            name: clerkUser.firstName && clerkUser.lastName 
+                ? `${clerkUser.firstName} ${clerkUser.lastName}`
+                : clerkUser.username || 'User'
+        } : null
     };
 };

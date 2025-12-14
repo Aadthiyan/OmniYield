@@ -34,6 +34,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@clerk/nextjs": "^6.36.2",
     "@openzeppelin/contracts": "^5.4.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",

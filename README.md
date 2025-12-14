@@ -2,6 +2,9 @@
 
 A comprehensive backend system for a cross-chain yield aggregator built with QIE SDK, Hardhat, and Node.js. This project enables users to optimize their DeFi yields across multiple blockchain networks.
 
+> **🔐 UPDATED: Authentication Now Uses Clerk**  
+> This project now uses [Clerk](https://clerk.com) for secure, enterprise-grade authentication. See [CLERK_DOCS_INDEX.md](CLERK_DOCS_INDEX.md) for complete setup instructions.
+
 ## 🚀 Features
 
 - **Cross-Chain Support**: Deploy and manage strategies across Ethereum, Polygon, BSC, and other networks
@@ -11,6 +14,7 @@ A comprehensive backend system for a cross-chain yield aggregator built with QIE
 - **Comprehensive Testing**: Full test suite for contracts and wallet integrations
 - **Gas Optimization**: Efficient transaction handling and gas management
 - **Security**: Built with OpenZeppelin security patterns and best practices
+- **Enterprise Authentication**: Clerk integration for secure user management
 
 ## 📋 Prerequisites
 
@@ -21,6 +25,7 @@ Before you begin, ensure you have the following installed:
 - **Git**
 - **MetaMask** browser extension (for wallet integration)
 - **QIE SDK API Keys** (sign up at [QIE Platform](https://qie.io))
+- **Clerk Account** (sign up at [Clerk.com](https://clerk.com)) - for authentication
 
 ## 🛠️ Installation
 
