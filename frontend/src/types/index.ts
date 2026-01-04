@@ -57,6 +57,7 @@ export type Network =
   | 'bsc'
   | 'arbitrum'
   | 'optimism'
+  | 'mainnet'
   | 'testnet';
 
 export interface YieldData {
@@ -296,7 +297,7 @@ export interface QIEWallet {
   address: string;
   privateKey?: string;
   mnemonic?: string;
-  type: 'privateKey' | 'mnemonic' | 'hardware';
+  type: 'privateKey' | 'mnemonic' | 'hardware' | 'extension';
 }
 
 export interface QIETransaction {

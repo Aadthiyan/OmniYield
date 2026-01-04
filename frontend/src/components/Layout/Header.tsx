@@ -8,9 +8,6 @@ import { useWallet } from '@/hooks/useWallet';
 import { useAuth } from '@/hooks/useAuth';
 import {
   BellIcon,
-  MoonIcon,
-  SunIcon,
-  ComputerDesktopIcon,
   Bars3Icon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
@@ -39,26 +36,28 @@ export const Header: React.FC = () => {
   const ui = useStore((state) => state.ui);
   const wallet = useStore((state) => state.wallet);
   const isWalletConnected = useStore((state) => state.isWalletConnected);
-  const setUI = useStore((state) => state.setUI);
-  const addNotification = useStore((state) => state.addNotification);
   const { connectWallet, disconnectWallet } = useWallet();
   const { logout } = useAuth();
 
-  const handleThemeToggle = () => {
-    const newTheme = ui.theme === 'light' ? 'dark' : ui.theme === 'dark' ? 'system' : 'light';
-    setUI({ theme: newTheme });
+  // Generate dynamic redirect URL based on current environment
+  const getRedirectUrl = () => {
+    if (typeof window !== 'undefined') {
+      const baseUrl = window.location.origin;
+      return `${baseUrl}/dashboard`;
+    }
+    return 'https://omniyield-theta.vercel.app/dashboard';
   };
 
-  const getThemeIcon = () => {
-    switch (ui.theme) {
-      case 'light':
-        return <SunIcon className="w-5 h-5" />;
-      case 'dark':
-        return <MoonIcon className="w-5 h-5" />;
-      default:
-        return <ComputerDesktopIcon className="w-5 h-5" />;
-    }
+  const getClerkSignInUrl = () => {
+    const redirectUrl = encodeURIComponent(getRedirectUrl());
+    return `https://infinite-aardvark-49.accounts.dev/sign-in?redirect_url=${redirectUrl}`;
   };
+
+  const getClerkSignUpUrl = () => {
+    const redirectUrl = encodeURIComponent(getRedirectUrl());
+    return `https://infinite-aardvark-49.accounts.dev/sign-up?redirect_url=${redirectUrl}`;
+  };
+
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -99,15 +98,6 @@ export const Header: React.FC = () => {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-3">
-            {/* Theme toggle */}
-            <button
-              onClick={handleThemeToggle}
-              className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title={`Current theme: ${ui.theme}`}
-            >
-              {getThemeIcon()}
-            </button>
-
             {/* Notifications */}
             <button
               onClick={() => {/* Notifications panel */ }}
@@ -162,12 +152,12 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link href="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                <a href={getClerkSignInUrl()} className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                   Log In
-                </Link>
-                <Link href="/signup" className="btn-primary text-sm px-4 py-2">
+                </a>
+                <a href={getClerkSignUpUrl()} className="btn-primary text-sm px-4 py-2">
                   Sign Up
-                </Link>
+                </a>
               </div>
             )}
 

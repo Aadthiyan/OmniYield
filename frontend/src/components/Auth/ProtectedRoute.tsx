@@ -14,7 +14,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     useEffect(() => {
         if (isLoaded && !isSignedIn) {
-            router.push('/login');
+            router.push('/sign-in');
         }
     }, [isLoaded, isSignedIn, router]);
 

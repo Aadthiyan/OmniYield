@@ -25,6 +25,25 @@ export default function LandingPage() {
         }
     }, [user, router]);
 
+    // Generate dynamic redirect URL based on current environment
+    const getRedirectUrl = () => {
+        if (typeof window !== 'undefined') {
+            const baseUrl = window.location.origin;
+            return `${baseUrl}/dashboard`;
+        }
+        return 'https://omniyield-theta.vercel.app/dashboard';
+    };
+
+    const getClerkSignInUrl = () => {
+        const redirectUrl = encodeURIComponent(getRedirectUrl());
+        return `https://infinite-aardvark-49.accounts.dev/sign-in?redirect_url=${redirectUrl}`;
+    };
+
+    const getClerkSignUpUrl = () => {
+        const redirectUrl = encodeURIComponent(getRedirectUrl());
+        return `https://infinite-aardvark-49.accounts.dev/sign-up?redirect_url=${redirectUrl}`;
+    };
+
     const features = [
         {
             icon: ChartBarIcon,
@@ -81,15 +100,15 @@ export default function LandingPage() {
                             <span className="text-2xl font-bold gradient-text">YieldX</span>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <Link href="/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">
+                            <a href={getClerkSignInUrl()} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium">
                                 Log In
-                            </Link>
-                            <Link
-                                href="/signup"
+                            </a>
+                            <a
+                                href={getClerkSignUpUrl()}
                                 className="btn-primary"
                             >
                                 Sign Up
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -108,13 +127,13 @@ export default function LandingPage() {
                             The smartest way to earn passive income from your crypto. Automated yield farming across multiple chains.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <Link
-                                href="/signup"
+                            <a
+                                href={getClerkSignUpUrl()}
                                 className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
                             >
                                 <span>Get Started</span>
                                 <ArrowRightIcon className="w-5 h-5" />
-                            </Link>
+                            </a>
                             <Link
                                 href="#features"
                                 className="btn-secondary text-lg px-8 py-4"
@@ -230,12 +249,12 @@ export default function LandingPage() {
                         <p className="text-xl mb-8 opacity-90">
                             Create your account and start maximizing your DeFi yields in minutes
                         </p>
-                        <Link
-                            href="/signup"
+                        <a
+                            href={getClerkSignUpUrl()}
                             className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 text-lg inline-block"
                         >
                             Sign Up Now
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </section>
