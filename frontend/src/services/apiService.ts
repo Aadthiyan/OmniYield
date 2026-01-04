@@ -145,6 +145,12 @@ class ApiService {
     };
   }
 
+  async subscribeToStrategy(strategyId: number): Promise<any> {
+    const response = await this.api.post(`/api/v1/yield/strategies/${strategyId}/subscribe`);
+    return response.data;
+  }
+
+
   // Yield data
   async getYieldData(strategyId?: number, network?: string, days: number = 7): Promise<YieldData[]> {
     const params = new URLSearchParams();

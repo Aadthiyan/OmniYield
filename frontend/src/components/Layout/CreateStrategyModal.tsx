@@ -53,7 +53,7 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target as any;
-    
+
     if (type === 'checkbox') {
       setFormData({
         ...formData,
@@ -115,7 +115,7 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
 
     try {
       setLoading(true);
-      
+
       const payload = {
         name: formData.name,
         type: formData.type,
@@ -128,7 +128,16 @@ export const CreateStrategyModal: React.FC<CreateStrategyModalProps> = ({
         meta_data: formData.meta_data
       };
 
-      await apiService.createStrategy(payload);
+      // Create the strategy
+      const createdStrategy = await apiService.createStrategy(payload);
+
+      // Subscribe the user to the strategy
+      try {
+        await apiService.subscribeToStrategy(createdStrategy.id);
+      } catch (subscribeError: any) {
+        console.warn('Failed to auto-subscribe to strategy:', subscribeError);
+        // Continue even if subscription fails
+      }
 
       addNotification({
         type: 'success',

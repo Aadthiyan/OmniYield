@@ -347,6 +347,74 @@ async def create_strategy(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@router.post("/strategies/{strategy_id}/subscribe")
+async def subscribe_to_strategy(
+    strategy_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Subscribe user to a strategy (creates UserStrategy record)"""
+    try:
+        # Check if strategy exists
+        strategy = db.query(Strategy).filter(Strategy.id == strategy_id).first()
+        if not strategy:
+            raise HTTPException(status_code=404, detail="Strategy not found")
+        
+        # Check if user is already subscribed
+        existing = db.query(UserStrategy).filter(
+            UserStrategy.user_id == current_user.id,
+            UserStrategy.strategy_id == strategy_id
+        ).first()
+        
+        if existing:
+            if not existing.is_active:
+                # Reactivate if previously deactivated
+                existing.is_active = True
+                db.commit()
+                return {"message": "Strategy subscription reactivated", "user_strategy_id": existing.id}
+            raise HTTPException(status_code=400, detail="Already subscribed to this strategy")
+        
+        # Create new UserStrategy
+        user_strategy = UserStrategy(
+            user_id=current_user.id,
+            strategy_id=strategy_id,
+            amount=0,  # Initial amount is 0
+            weight=0.0,
+            is_active=True
+        )
+        
+        db.add(user_strategy)
+        db.commit()
+        db.refresh(user_strategy)
+        
+        logger.info(f"User {current_user.id} subscribed to strategy {strategy_id}")
+        
+        return {
+            "message": "Successfully subscribed to strategy",
+            "user_strategy_id": user_strategy.id,
+            "strategy": StrategyResponse(
+                id=strategy.id,
+                name=strategy.name,
+                type=strategy.type,
+                contract_address=strategy.contract_address,
+                network=strategy.network,
+                apy=strategy.apy,
+                tvl=strategy.tvl,
+                risk_score=strategy.risk_score,
+                is_active=strategy.is_active,
+                created_at=strategy.created_at,
+                updated_at=strategy.updated_at
+            )
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to subscribe to strategy: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
 @router.get("/strategies/{strategy_id}", response_model=StrategyResponse)
 async def get_strategy(strategy_id: int, db: Session = Depends(get_db)):
     """Get specific strategy details"""
