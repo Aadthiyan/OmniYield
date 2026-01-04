@@ -233,6 +233,64 @@ async def get_strategies(
         raise HTTPException(status_code=500, detail=f"Failed to get strategies: {str(e)}")
 
 
+@router.get("/user-strategies", response_model=List[StrategyResponse])
+async def get_user_strategies(
+    network: Optional[str] = None,
+    active_only: bool = True,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get strategies for the authenticated user"""
+    try:
+        # Query user's strategies by joining UserStrategy and Strategy tables
+        query = db.query(Strategy).join(
+            UserStrategy, 
+            Strategy.id == UserStrategy.strategy_id
+        ).filter(
+            UserStrategy.user_id == current_user.id
+        )
+        
+        if network:
+            query = query.filter(Strategy.network == network)
+        
+        if active_only:
+            query = query.filter(
+                Strategy.is_active == True,
+                UserStrategy.is_active == True
+            )
+        
+        strategies = query.order_by(Strategy.apy.desc()).all()
+        
+        response_strategies = []
+        for strategy in strategies:
+            try:
+                response_strategies.append(
+                    StrategyResponse(
+                        id=strategy.id,
+                        name=strategy.name,
+                        type=strategy.type,
+                        contract_address=strategy.contract_address,
+                        network=strategy.network,
+                        apy=float(strategy.apy),
+                        tvl=int(strategy.tvl),
+                        risk_score=float(strategy.risk_score),
+                        is_active=strategy.is_active,
+                        created_at=strategy.created_at,
+                        updated_at=strategy.updated_at
+                    )
+                )
+            except Exception as strategy_error:
+                logger.error(f"Error converting strategy {strategy.id}: {strategy_error}")
+                raise
+        
+        logger.info(f"Retrieved {len(response_strategies)} strategies for user {current_user.id}")
+        return response_strategies
+        
+    except Exception as e:
+        logger.error(f"Failed to get user strategies: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to get user strategies: {str(e)}")
+
+
 @router.post("/strategies", response_model=StrategyResponse)
 async def create_strategy(
     request: CreateStrategyRequest,

@@ -19,17 +19,49 @@ export default function StrategiesPage() {
     const { fetchStrategies } = useStrategies();
     const strategies = useStore((state) => state.strategies);
     const loading = useStore((state) => state.loading);
+    const user = useStore((state) => state.user);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedNetwork, setSelectedNetwork] = useState<Network | 'all'>('all');
     const [minApy, setMinApy] = useState(0);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [userStrategies, setUserStrategies] = useState<any[]>([]);
+    const [loadingUserStrategies, setLoadingUserStrategies] = useState(true);
 
+    // Fetch user-specific strategies
     useEffect(() => {
-        fetchStrategies();
-    }, [fetchStrategies]);
+        const fetchUserStrategies = async () => {
+            if (!user) return;
 
-    const filteredStrategies = strategies.filter((strategy) => {
+            try {
+                setLoadingUserStrategies(true);
+                // Fetch user's strategies from backend
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/yield/user-strategies`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserStrategies(data);
+                } else {
+                    console.error('Failed to fetch user strategies');
+                    setUserStrategies([]);
+                }
+            } catch (error) {
+                console.error('Error fetching user strategies:', error);
+                setUserStrategies([]);
+            } finally {
+                setLoadingUserStrategies(false);
+            }
+        };
+
+        fetchUserStrategies();
+    }, [user]);
+
+    const filteredStrategies = userStrategies.filter((strategy) => {
         const matchesSearch = strategy.name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesNetwork = selectedNetwork === 'all' || strategy.network === selectedNetwork;
         const matchesApy = strategy.apy >= minApy;
@@ -40,6 +72,29 @@ export default function StrategiesPage() {
         console.log('Investing in strategy:', strategyId, strategyName);
         // TODO: Implement investment logic with backend
         alert(`Investment initiated for ${strategyName}`);
+    };
+
+    const refetchUserStrategies = async () => {
+        if (!user) return;
+
+        try {
+            setLoadingUserStrategies(true);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/yield/user-strategies`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setUserStrategies(data);
+            }
+        } catch (error) {
+            console.error('Error refetching user strategies:', error);
+        } finally {
+            setLoadingUserStrategies(false);
+        }
     };
 
     return (
@@ -123,10 +178,10 @@ export default function StrategiesPage() {
                 </div>
 
                 {/* Strategies Grid */}
-                {loading.strategies ? (
+                {loadingUserStrategies ? (
                     <div className="text-center py-12">
                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading strategies...</p>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your strategies...</p>
                     </div>
                 ) : filteredStrategies.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -169,7 +224,7 @@ export default function StrategiesPage() {
                                     </div>
 
                                     {/* Action Button */}
-                                    <button 
+                                    <button
                                         onClick={() => handleInvestStrategy(strategy.id, strategy.name)}
                                         className="w-full btn-primary"
                                     >
@@ -186,7 +241,7 @@ export default function StrategiesPage() {
                             <p className="text-gray-600 dark:text-gray-400 mb-6">
                                 No strategies match your filters. Try adjusting your search criteria.
                             </p>
-                            <a 
+                            <a
                                 href="/strategies"
                                 className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
                                 onClick={() => {
@@ -205,7 +260,7 @@ export default function StrategiesPage() {
                 <CreateStrategyModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
-                    onSuccess={() => fetchStrategies()}
+                    onSuccess={() => refetchUserStrategies()}
                 />
             </div>
         </DashboardLayout>

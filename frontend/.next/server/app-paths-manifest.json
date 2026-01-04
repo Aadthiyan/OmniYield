@@ -1,8 +1,7 @@
 {
-  "/dashboard/page": "app/dashboard/page.js",
-  "/wallet/page": "app/wallet/page.js",
   "/bridge/page": "app/bridge/page.js",
   "/strategies/page": "app/strategies/page.js",
   "/portfolio/page": "app/portfolio/page.js",
-  "/security/page": "app/security/page.js"
+  "/security/page": "app/security/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
 }
