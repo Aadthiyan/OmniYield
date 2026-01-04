@@ -14,30 +14,28 @@ export const useWallet = () => {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
 
-  // Connect wallet (simplified for development)
+  // Connect wallet using QIE Wallet Service
   const connectWallet = useCallback(async (type: 'privateKey' | 'mnemonic' | 'hardware' = 'privateKey') => {
     try {
       setIsConnecting(true);
       setError(null);
 
-      // For development: Use mock wallet data
-      const mockWalletInfo: WalletInfo = {
-        address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-        balance: '1000000000000000000', // 1 ETH
-        network: 'ethereum',
-        chainId: 1,
-        isConnected: true
-      };
+      // Connect to QIE wallet
+      const qieWallet = await qieWalletService.connectWallet(type);
+      
+      // Get wallet info from QIE service
+      const walletInfo = await qieWalletService.getWalletInfo();
+      
+      if (!walletInfo) {
+        throw new Error('Failed to retrieve wallet information');
+      }
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setWallet(mockWalletInfo);
+      setWallet(walletInfo);
       setWalletConnected(true);
       addNotification({
         type: 'success',
         title: 'Wallet Connected',
-        message: `Successfully connected to wallet ${mockWalletInfo.address.slice(0, 6)}...${mockWalletInfo.address.slice(-4)}`,
+        message: `Successfully connected to QIE wallet ${walletInfo.address.slice(0, 6)}...${walletInfo.address.slice(-4)}`,
         read: false
       });
     } catch (error) {

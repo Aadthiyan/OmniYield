@@ -61,7 +61,7 @@ class QIESDK {
 
     try {
       const balance = await this.provider.getBalance(this.wallet.address);
-      
+
       return {
         address: this.wallet.address,
         balance: balance.toString(),
@@ -83,7 +83,7 @@ class QIESDK {
 
     try {
       const wallet = new ethers.Wallet(this.wallet.privateKey!, this.provider);
-      
+
       const tx = await wallet.sendTransaction({
         to: transaction.to,
         value: transaction.value ? ethers.parseEther(transaction.value) : 0,
@@ -189,27 +189,40 @@ export class QIEWalletService {
 
   private initializeSDK() {
     const config: QIEConfig = {
-      network: (process.env.NEXT_PUBLIC_QIE_NETWORK as Network) || 'testnet',
-      rpcUrl: this.getRpcUrl((process.env.NEXT_PUBLIC_QIE_NETWORK as Network) || 'testnet'),
-      chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '5'),
+      network: (process.env.NEXT_PUBLIC_QIE_NETWORK as Network) || 'mainnet',
+      rpcUrl: process.env.NEXT_PUBLIC_QIE_RPC_URL || 'https://rpc-main1.qiblockchain.online/',
+      chainId: parseInt(process.env.NEXT_PUBLIC_QIE_CHAIN_ID || '5656'),
       apiKey: process.env.NEXT_PUBLIC_QIE_API_KEY,
       secretKey: process.env.NEXT_PUBLIC_QIE_SECRET_KEY
     };
+
+    // Log network configuration for debugging
+    console.log('🔗 QIE Wallet Service Initialized:');
+    console.log(`   Network: ${config.network}`);
+    console.log(`   RPC URL: ${config.rpcUrl}`);
+    console.log(`   Chain ID: ${config.chainId}`);
+    console.log(`   Using ${config.chainId === 5656 ? 'QIE MAINNET ✅' : config.chainId === 31337 ? 'LOCAL DEVELOPMENT' : 'CUSTOM NETWORK'}`);
 
     this.sdk = new QIESDK(config);
   }
 
   private getRpcUrl(network: Network): string {
+    // If custom RPC URL is provided, use it
+    if (process.env.NEXT_PUBLIC_QIE_RPC_URL) {
+      return process.env.NEXT_PUBLIC_QIE_RPC_URL;
+    }
+
     const rpcUrls = {
       ethereum: 'https://mainnet.infura.io/v3/your_key',
       polygon: 'https://polygon-rpc.com',
       bsc: 'https://bsc-dataseed.binance.org',
       arbitrum: 'https://arb1.arbitrum.io/rpc',
       optimism: 'https://mainnet.optimism.io',
-      testnet: 'https://goerli.infura.io/v3/your_key'
+      testnet: 'https://rpc-main1.qiblockchain.online/', // QIE uses mainnet for development (near-zero fees)
+      mainnet: 'https://rpc-main1.qiblockchain.online/'
     };
 
-    return rpcUrls[network] || rpcUrls.testnet;
+    return rpcUrls[network] || rpcUrls.mainnet;
   }
 
   async connectWallet(type: 'privateKey' | 'mnemonic' | 'hardware' = 'privateKey'): Promise<QIEWallet> {
