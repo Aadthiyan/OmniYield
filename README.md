@@ -5,6 +5,8 @@ A comprehensive backend system for a cross-chain yield aggregator built with QIE
 > **🔐 UPDATED: Authentication Now Uses Clerk**  
 > This project now uses [Clerk](https://clerk.com) for secure, enterprise-grade authentication. See [CLERK_DOCS_INDEX.md](CLERK_DOCS_INDEX.md) for complete setup instructions.
 
+## Live Demo : https://omniyield-theta.vercel.app/
+
 ## 🚀 Features
 
 - **Cross-Chain Support**: Deploy and manage strategies across Ethereum, Polygon, BSC, and other networks
